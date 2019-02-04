@@ -30,4 +30,10 @@ public class UserController {
         model.addAttribute("users", userService.advancedUserSearch(name, surname, roles, minAge, maxAge, project, genres, order, asc));
         return "userList";
     }
+    
+    @RequestMapping(value = "/test/users", method = RequestMethod.GET)
+    public String testUsersBySurname(Model model) {
+        model.addAttribute("users", userService.advancedUserSearch("Martin", "Scorsese", null, 0, 100, null, null, null, false));
+        return "userList";
+    }
 }

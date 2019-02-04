@@ -32,6 +32,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <beans:list>
                 <beans:value>com.model.User</beans:value>
                 <beans:value>com.model.Project</beans:value>
+                <beans:value>com.model.Experience</beans:value>
             </beans:list>
         </beans:property>
         <beans:property name="hibernateProperties">

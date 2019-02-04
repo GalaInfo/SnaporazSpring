@@ -1,12 +1,12 @@
 package com.dao;
 
-import com.model.Experience;
 import com.model.User;
+import java.util.Calendar;
 import java.util.List;
-import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,19 +52,46 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public List<User> advancedUserSearch(String name, String surname, String roles, int minAge, int maxAge, String project, String genres, String order, boolean asc) {
         Session session = this.sessionFactory.getCurrentSession();
-        Criteria c = session.createCriteria(Experience.class, "experience");
-        c.createAlias("experience.user", "user");
+        String hql = "SELECT u FROM User u";
+        hql += roles != null || project != null || genres != null ? ", Experience e WHERE u.id = e.user AND e.role LIKE :role AND e.title LIKE :project AND e.genres LIKE :genres" : " WHERE 1 = 1";
+        
+        hql += " AND u.name LIKE :name AND u.surname LIKE :surname AND u.birth >= :minBirth AND u.birth <= :maxBirth ORDER BY ";
+        
+        hql += "surname".equals(order) ? "u.surname" : "u.birth";
+        hql += asc ? " ASC" : " DESC";
+                
+        Query q = session.createQuery(hql);
+        
         if(name != null)
-            c.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
+            q.setString("name", "%" + name + "%");
+        else
+            q.setString("name", "%%");
         if(surname != null)
-            c.add(Restrictions.like("surname", surname, MatchMode.ANYWHERE));
-        if(roles != null){
-            String[] rolesArray = roles.split(",");
-            for(String role : rolesArray)
-                c.add(Restrictions.eq("role", role));
+            q.setString("surname", "%" + surname + "%");
+        else
+            q.setString("surname", "%%");
+        
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -maxAge);
+        q.setDate("minBirth", cal.getTime());
+        cal.add(Calendar.YEAR, maxAge - minAge);
+        q.setDate("maxBirth", cal.getTime());
+
+        if(roles != null || project != null || genres != null){
+            if(roles != null)
+                q.setString("role", "%" + roles + "%");
+            else
+                q.setString("role", "%%");
+            if(project != null)
+                q.setString("project", "%" + project + "%");
+            else
+                q.setString("project", "%%");
+            if(genres != null)
+                q.setString("genres", "%" + genres + "%");
+            else
+                q.setString("genres", "%%");
         }
-        if(surname != null)
-            c.add(Restrictions.like("surname", surname, MatchMode.ANYWHERE));
-        return c.list();
+        
+        return q.list();
     }
 }
