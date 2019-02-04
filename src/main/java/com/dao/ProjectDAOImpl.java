@@ -5,6 +5,7 @@
  */
 package com.dao;
 
+import com.extra.OrderBySqlFormula;
 import com.model.Project;
 import java.util.List;
 import org.hibernate.Session;
@@ -63,7 +64,7 @@ public class ProjectDAOImpl implements ProjectDAO{
     @Override
     public List<Project> listNearestProjects() {
         Session session = this.sessionFactory.getCurrentSession();
-        return session.createCriteria(Project.class).add(Restrictions.ltProperty("actual", "min")).addOrder(Order.desc("actual")).setMaxResults(3).list();
+        return session.createCriteria(Project.class).add(Restrictions.ltProperty("actual", "min")).addOrder(OrderBySqlFormula.sqlFormula("(attuale / minimo) DESC")).setMaxResults(3).list();
     }
     
     
