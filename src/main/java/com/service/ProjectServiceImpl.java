@@ -19,8 +19,32 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    public Project getProjectById(int id) {
+        return projectDAO.getProjectById(id);
+    }
+
+    @Override
+    @Transactional
     public List<Project> listProjectsByTitle(String title) {
         return projectDAO.listProjectsByTitle(title);
+    }
+
+    @Override
+    @Transactional
+    public List<Project> listMostFoundedProjects() {
+        return projectDAO.listMostFoundedProjects();
+    }
+
+    @Override
+    @Transactional
+    public List<Project> listMostRecentProjects() {
+        return projectDAO.listMostRecentProjects();
+    }
+
+    @Override
+    @Transactional
+    public List<Project> listNearestProjects() {
+        return projectDAO.listNearestProjects();
     }
 
 }

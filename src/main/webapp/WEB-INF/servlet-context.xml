@@ -33,6 +33,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <beans:value>com.model.User</beans:value>
                 <beans:value>com.model.Project</beans:value>
                 <beans:value>com.model.Experience</beans:value>
+                <beans:value>com.model.Part</beans:value>
             </beans:list>
         </beans:property>
         <beans:property name="hibernateProperties">
@@ -54,6 +55,18 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </beans:bean>
     <beans:bean id="projectService" class="com.service.ProjectServiceImpl">
         <beans:property name="projectDAO" ref="projectDAO"></beans:property>
+    </beans:bean>
+    <beans:bean id="experienceDAO" class="com.dao.ExperienceDAOImpl">
+        <beans:property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </beans:bean>
+    <beans:bean id="experienceService" class="com.service.ExperienceServiceImpl">
+        <beans:property name="experienceDAO" ref="experienceDAO"></beans:property>
+    </beans:bean>
+        <beans:bean id="partDAO" class="com.dao.PartDAOImpl">
+        <beans:property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </beans:bean>
+    <beans:bean id="partService" class="com.service.PartServiceImpl">
+        <beans:property name="partDAO" ref="partDAO"></beans:property>
     </beans:bean>
     <context:component-scan base-package="com" />
     <tx:annotation-driven transaction-manager="transactionManager"/>

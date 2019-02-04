@@ -11,4 +11,5 @@
       <json:property name="name" value="${project.title}"/>
     </json:object>
   </json:array>
+
 <% response.setContentType("application/json");%>

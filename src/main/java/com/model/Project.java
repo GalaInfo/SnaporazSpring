@@ -36,7 +36,7 @@ public class Project {
     @Column(name = "premi")
     private String prizes;
     //ridondanza da aggiungere al DB
-    private int donations;
+    //private int donations;
 
     public int getId() {
         return id;

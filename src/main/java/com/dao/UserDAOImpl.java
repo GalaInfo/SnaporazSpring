@@ -6,7 +6,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,20 +32,18 @@ public class UserDAOImpl implements UserDAO {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public User getUserById(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Session session = this.sessionFactory.getCurrentSession();
+        return (User) session.createCriteria(User.class).add(Restrictions.eq("id", id)).uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<User> listUsersBySurname(String surname) {
         Session session = this.sessionFactory.getCurrentSession();
-        List<User> list = session.createCriteria(User.class).add(Restrictions.eq("surname", surname)).list();
-        for (User u : list) {
-            LOGGER.info("User List::" + u);
-        }
-        return list;
+        return session.createCriteria(User.class).add(Restrictions.like("surname", surname, MatchMode.ANYWHERE)).list();
     }
 
     @SuppressWarnings("unchecked")

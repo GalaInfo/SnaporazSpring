@@ -19,6 +19,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public User getUserById(int id) {
+        return userDAO.getUserById(id);
+    }
+    
+    @Override
+    @Transactional
     public List<User> listUsersBySurname(String surname) {
         return userDAO.listUsersBySurname(surname);
     }

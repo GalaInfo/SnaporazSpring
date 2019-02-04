@@ -14,13 +14,7 @@ import java.util.List;
  */
 public interface ExperienceDAO {
 
-    public void addExperience(Experience p);
+    public void addExperience(Experience e);
 
-    public void updateExperience(Experience p);
-
-    public List<Experience> listExperience();
-
-    public Experience getExperienceById(int id);
-
-    public void removeExperience(int id);
+    public List<Experience> listExperiencesByUser(int id);
 }

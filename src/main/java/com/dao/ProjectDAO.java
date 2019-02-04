@@ -21,6 +21,10 @@ public interface ProjectDAO {
     public List<Project> listProjectsByTitle(String title);
 
     public Project getProjectById(int id);
-
-    public void removeProject(int id);
+    
+    public List<Project> listMostFoundedProjects();
+    
+    public List<Project> listMostRecentProjects();
+    
+    public List<Project> listNearestProjects();
 }
