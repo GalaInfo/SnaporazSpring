@@ -29,8 +29,16 @@
             </json:array>
         </json:object>
     </json:array>
+    <json:array name="related" var="rel" items="${related}">
+        <json:object>
+            <json:property name="id" value="${rel.id}"/>
+            <json:property name="title" value="${rel.title}"/>
+            <json:property name="genres" value="${rel.genres}"/>
+            <json:property name="owner" value="${rel.owner}"/>
+            <json:property name="image" value="${rel.img}"/>
+        </json:object>
+    </json:array>
 </json:object>
 
-<% response.setContentType("application/json");%>
-
-
+<% response.setContentType("application/json");
+    response.setHeader("Access-Control-Allow-Origin", "http://localhost:8383");%>

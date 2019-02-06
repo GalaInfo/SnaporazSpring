@@ -14,6 +14,7 @@
       <json:property name="image" value="${user.image}"/>
     </json:object>
   </json:array>
-<% response.setContentType("application/json");%>
 
+<% response.setContentType("application/json");
+response.setHeader("Access-Control-Allow-Origin", "http://localhost:8383");%>
 

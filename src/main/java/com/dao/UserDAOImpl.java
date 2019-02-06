@@ -50,7 +50,7 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public List<User> advancedUserSearch(String name, String surname, String roles, int minAge, int maxAge, String project, String genres, String order, boolean asc) {
         Session session = this.sessionFactory.getCurrentSession();
-        String hql = "SELECT u FROM User u";
+        String hql = "SELECT DISTINCT u FROM User u";
         hql += roles != null || project != null || genres != null ? ", Experience e WHERE u.id = e.user AND e.role LIKE :role AND e.title LIKE :project AND e.genres LIKE :genres" : " WHERE 1 = 1";
         
         hql += " AND u.name LIKE :name AND u.surname LIKE :surname AND u.birth >= :minBirth AND u.birth <= :maxBirth ORDER BY ";

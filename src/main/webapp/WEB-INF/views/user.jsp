@@ -23,6 +23,7 @@
     </json:array>
 </json:object>
 
-<% response.setContentType("application/json");%>
+<% response.setContentType("application/json");
+response.setHeader("Access-Control-Allow-Origin", "http://localhost:8383");%>
 
 

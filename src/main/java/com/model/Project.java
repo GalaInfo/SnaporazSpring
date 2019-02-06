@@ -31,10 +31,10 @@ public class Project {
     private double actual;
     @Column(name = "minimo")
     private double min;
-    @Column(name = "proprietario")
-    private int owner;
     @Column(name = "premi")
     private String prizes;
+    @Column(name = "proprietario")
+    private int owner;
     //ridondanza da aggiungere al DB
     //private int donations;
 

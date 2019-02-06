@@ -7,7 +7,9 @@ package com.dao;
 
 import com.extra.OrderBySqlFormula;
 import com.model.Project;
+import java.util.Calendar;
 import java.util.List;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
@@ -27,15 +29,49 @@ public class ProjectDAOImpl implements ProjectDAO{
     }
     
     @Override
-    public void addProject(Project p) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int addProject(Project p) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.save(p);
+        return p.getId();
     }
 
     @Override
     public void updateProject(Project p) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    public List<Project> advancedProjectSearch(String title, String owner, String genre, String collab, String order, boolean asc) {
+        Session session = this.sessionFactory.getCurrentSession();
+        String hql = "SELECT DISTINCT pr FROM Project pr, User o";
+        hql += collab != null ? ", User u, Part pa WHERE pr.id = pa.project AND u.id = pa.user AND  u.surname LIKE :collab" : " WHERE 1 = 1";
+        
+        hql += " AND o.id = pr.owner AND pr.title LIKE :title AND o.surname LIKE :owner AND pr.genres LIKE :genre ORDER BY ";
+        
+        hql += "title".equals(order) ? "pr.title" : "pr.actual";
+        hql += asc ? " ASC" : " DESC";
+                
+        Query q = session.createQuery(hql);
+        
+        if(title != null)
+            q.setString("title", "%" + title + "%");
+        else
+            q.setString("title", "%%");
+        if(owner != null)
+            q.setString("owner", "%" + owner + "%");
+        else
+            q.setString("owner", "%%");
+        if(genre != null)
+            q.setString("genre", "%" + genre + "%");
+        else
+            q.setString("genre", "%%");
+        if(collab != null){
+            q.setString("collab", "%" + collab + "%");
+        }
+        
+        return q.list();
+    }
+        
     @SuppressWarnings("unchecked")
     @Override
     public List<Project> listProjectsByTitle(String title) {
@@ -67,5 +103,10 @@ public class ProjectDAOImpl implements ProjectDAO{
         return session.createCriteria(Project.class).add(Restrictions.ltProperty("actual", "min")).addOrder(OrderBySqlFormula.sqlFormula("(attuale / minimo) DESC")).setMaxResults(3).list();
     }
     
-    
+    @Override
+    public List<Project> listRelatedProjects(int owner, String genres) {
+        Session session = this.sessionFactory.getCurrentSession();        
+        Calendar cal = Calendar.getInstance();
+        return session.createCriteria(Project.class).add(Restrictions.gt("deadLine", cal.getTime())).add(Restrictions.disjunction().add(Restrictions.eq("owner", owner)).add(Restrictions.like("genres", genres, MatchMode.ANYWHERE))).addOrder(Order.asc("deadLine")).setMaxResults(3).list();
+    }
 }

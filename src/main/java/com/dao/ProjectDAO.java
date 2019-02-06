@@ -14,9 +14,11 @@ import java.util.List;
  */
 public interface ProjectDAO {
 
-    public void addProject(Project p);
+    public int addProject(Project p);
 
     public void updateProject(Project p);
+    
+    public List<Project> advancedProjectSearch(String title, String owner, String genre, String collab, String order, boolean asc);
 
     public List<Project> listProjectsByTitle(String title);
 
@@ -27,4 +29,7 @@ public interface ProjectDAO {
     public List<Project> listMostRecentProjects();
     
     public List<Project> listClosestProjects();
+    
+    public List<Project> listRelatedProjects(int owner, String genres);
+    
 }

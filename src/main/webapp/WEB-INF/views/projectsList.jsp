@@ -8,8 +8,9 @@
   <json:array name="projects" var="project" items="${projects}">
     <json:object>
       <json:property name="id" value="${project.id}"/>
-      <json:property name="name" value="${project.title}"/>
+      <json:property name="title" value="${project.title}"/>
     </json:object>
   </json:array>
 
-<% response.setContentType("application/json");%>
+<% response.setContentType("application/json");
+response.setHeader("Access-Control-Allow-Origin", "http://localhost:8383");%>
