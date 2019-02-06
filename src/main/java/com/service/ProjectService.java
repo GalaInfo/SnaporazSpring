@@ -13,6 +13,6 @@ public interface ProjectService {
     
     public List<Project> listMostRecentProjects();
     
-    public List<Project> listNearestProjects();
+    public List<Project> listClosestProjects();
 
 }

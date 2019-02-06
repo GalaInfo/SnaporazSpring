@@ -62,7 +62,7 @@ public class ProjectDAOImpl implements ProjectDAO{
     }
 
     @Override
-    public List<Project> listNearestProjects() {
+    public List<Project> listClosestProjects() {
         Session session = this.sessionFactory.getCurrentSession();
         return session.createCriteria(Project.class).add(Restrictions.ltProperty("actual", "min")).addOrder(OrderBySqlFormula.sqlFormula("(attuale / minimo) DESC")).setMaxResults(3).list();
     }

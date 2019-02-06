@@ -19,6 +19,14 @@
             <json:property name="character" value="${part.character}"/>
             <json:property name="user" value="${part.user}"/>
             <json:property name="project" value="${part.project}"/>
+            <c:set var="id" value="part${part.id}"/>
+            <json:array name="candidates" var="cand" items="${requestScope[id]}">
+                <json:object>
+                    <json:property name="id" value="${cand.id}"/>
+                    <json:property name="name" value="${cand.name}"/>
+                    <json:property name="surname" value="${cand.surname}"/>
+                </json:object>
+            </json:array>
         </json:object>
     </json:array>
 </json:object>

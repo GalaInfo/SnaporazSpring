@@ -26,5 +26,5 @@ public interface ProjectDAO {
     
     public List<Project> listMostRecentProjects();
     
-    public List<Project> listNearestProjects();
+    public List<Project> listClosestProjects();
 }

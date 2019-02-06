@@ -16,11 +16,5 @@ public interface CandidacyDAO {
 
     public void addCandidacy(Candidacy p);
 
-    public void updateCandidacy(Candidacy p);
-
-    public List<Candidacy> listCandidacy();
-
-    public Candidacy getserCandidacyById(int id);
-
-    public void removeCandidacy(int id);
+    public List<Candidacy> listCandidaciesByPart(int id);
 }

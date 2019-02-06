@@ -23,7 +23,7 @@
         </json:object>
     </json:array>
 
-    <json:array name="closestProjects" var="project" items="${nearestProjects}">
+    <json:array name="closestProjects" var="project" items="${closestProjects}">
         <json:object>
             <json:property name="id" value="${project.id}"/>
             <json:property name="title" value="${project.title}"/>

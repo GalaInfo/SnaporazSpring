@@ -43,8 +43,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public List<Project> listNearestProjects() {
-        return projectDAO.listNearestProjects();
+    public List<Project> listClosestProjects() {
+        return projectDAO.listClosestProjects();
     }
 
 }

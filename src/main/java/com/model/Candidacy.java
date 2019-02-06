@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PARTE")
+@Table(name = "CANDIDATURA")
 public class Candidacy {
 
     @Id
@@ -17,7 +17,7 @@ public class Candidacy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "parte")
-    private Part part;
+    private int part;
     @Column(name = "utente")
     private int user;
 
@@ -25,7 +25,7 @@ public class Candidacy {
         return id;
     }
 
-    public Part getPart() {
+    public int getPart() {
         return part;
     }
 
@@ -37,7 +37,7 @@ public class Candidacy {
         this.id = id;
     }
 
-    public void setPart(Part part) {
+    public void setPart(int part) {
         this.part = part;
     }
 
