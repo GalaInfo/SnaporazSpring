@@ -67,19 +67,23 @@ public class ProjectController {
         List<Part> parts = partService.listPartsByProject(id);
         model.addAttribute("parts", parts);
         for (Part p : parts) {
-            List<User> users = new ArrayList<>();
-            for (Candidacy c : candidacyService.listCandidaciesByPart(p.getId())) {
-                users.add(userService.getUserById(c.getUser()));
+            if (p.getUser() == null) {
+                List<User> users = new ArrayList<>();
+                for (Candidacy c : candidacyService.listCandidaciesByPart(p.getId())) {
+                    users.add(userService.getUserById(c.getUser()));
+                }
+                model.addAttribute("part" + p.getId(), users);
             }
-            model.addAttribute("part" + p.getId(), users);
         }
-        model.addAttribute("related", projectService.listRelatedProjects(id, pr.getGenres()));
+        if(pr != null)
+            model.addAttribute("related", projectService.listRelatedProjects(id, pr.getGenres()));
         return "project";
     }
 
     @RequestMapping(value = "/project", method = RequestMethod.POST)
     public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam int owner) {
         try {
+            //owner da togliere e prenderlo direttamente dalla sessione
             int projectId = projectService.addProject(title, genres, plot, img, min, prizes, owner);
             return getProjectById(model, projectId);
         } catch (ConstraintViolationException e) {
@@ -101,6 +105,88 @@ public class ProjectController {
         return "response";
     }
 
+    @RequestMapping(value = "/part", method = RequestMethod.POST)
+    public String addPart(Model model, @RequestParam int project, @RequestParam String role, @RequestParam String character) {
+        try {
+            partService.addPart(project, role, character);
+            return getProjectById(model, project);
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Creazione della parte fallita");
+        }
+        return "response";
+    }
+
+    @RequestMapping(value = "/test/part", method = RequestMethod.GET)
+    public String addPart(Model model) {
+        try {
+            partService.addPart(0, "Attore Protagonista", "Jake La Motta");
+            return getProjectById(model, 0);
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Creazione della parte fallita");
+        }
+        return "response";
+    }
+    
+    @RequestMapping(value = "/assign", method = RequestMethod.POST)
+    public String addPart(Model model, @RequestParam int candidacy) {
+        //solo se lo user della sessione è il proprietario del progetto
+        try {
+            Candidacy c = candidacyService.getCandidacyById(candidacy);
+            partService.updatePart(c.getPart(), c.getUser());
+            int project = partService.getPartById(c.getPart()).getProject();
+            return getProjectById(model, project);
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Assegnamento della parte fallita");
+        }
+        return "response";
+    }
+    
+    //test
+    @RequestMapping(value = "/assign", method = RequestMethod.GET)
+    public String assign(Model model) {
+        //solo se lo user della sessione è il proprietario del progetto
+        try {
+            Candidacy c = candidacyService.getCandidacyById(0);
+            partService.updatePart(c.getPart(), c.getUser());
+            int project = partService.getPartById(c.getPart()).getProject();
+            return getProjectById(model, project);
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Assegnamento della parte fallita");
+        }
+        return "response";
+    }
+    
+    @RequestMapping(value = "/candidacy", method = RequestMethod.POST)
+    public String addCandidacy(Model model, @RequestParam int part, @RequestParam int user) {
+        //user da togliere e prenderlo direttamente dalla sessione
+        try {
+            candidacyService.addCandidacy(part, user);
+            Part p = partService.getPartById(part);
+            return getProjectById(model, p.getProject());
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Creazione della candidatura fallita");
+        }
+        return "response";
+    }
+    
+    @RequestMapping(value = "/test/candidacy", method = RequestMethod.GET)
+    public String addCandidacy(Model model) {
+        try {
+            candidacyService.addCandidacy(4, 0);
+            Part p = partService.getPartById(4);
+            return getProjectById(model, p.getProject());
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Creazione della candidatura fallita");
+        }
+        return "response";
+    }
+    
     @RequestMapping(value = "/projects/{title}", method = RequestMethod.GET)
     public String listProjecstByTitle(Model model, @PathVariable String title) {
         model.addAttribute("projects", projectService.listProjectsByTitle(title));

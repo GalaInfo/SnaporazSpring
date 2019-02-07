@@ -14,7 +14,9 @@ import java.util.List;
  */
 public interface CandidacyDAO {
 
-    public void addCandidacy(Candidacy p);
+    public void addCandidacy(Candidacy c);
+    
+    public Candidacy getCandidacyById(int id);
 
     public List<Candidacy> listCandidaciesByPart(int id);
 }

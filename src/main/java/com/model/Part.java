@@ -1,14 +1,12 @@
 
 package com.model;
 
-import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
 
 @Entity
 @Table(name = "PARTE")
@@ -23,7 +21,7 @@ public class Part {
     @Column(name = "personaggio")
     private String character;
     @Column(name = "utente")
-    private int user;
+    private Integer user;
     @Column(name = "progetto")
     private int project;
 
@@ -39,7 +37,7 @@ public class Part {
         return character;
     }
 
-    public int getUser() {
+    public Integer getUser() {
         return user;
     }
 
@@ -59,7 +57,7 @@ public class Part {
         this.character = character;
     }
 
-    public void setUser(int user) {
+    public void setUser(Integer user) {
         this.user = user;
     }
 

@@ -19,10 +19,20 @@ public class CandidacyServiceImpl implements CandidacyService {
 
     @Override
     @Transactional
-    public void addCandidacy(Candidacy c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void addCandidacy(int part, int user) {
+        Candidacy p = new Candidacy();
+        p.setPart(part);
+        p.setUser(user);
+        
+        candidacyDAO.addCandidacy(p);
     }
 
+    @Override
+    @Transactional
+    public Candidacy getCandidacyById(int id) {
+        return candidacyDAO.getCandidacyById(id);
+    }
+    
     @Override
     @Transactional
     public List<Candidacy> listCandidaciesByPart(int id) {

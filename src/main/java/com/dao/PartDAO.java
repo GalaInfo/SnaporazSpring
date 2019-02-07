@@ -17,6 +17,8 @@ public interface PartDAO {
     public void addPart(Part p);
 
     public void updatePart(Part p);
+    
+    public Part getPartById(int id);
 
     public List<Part> listPartsByProject(int id);
 }

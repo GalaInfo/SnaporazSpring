@@ -2,6 +2,9 @@ package com.controller;
 
 import com.service.ExperienceService;
 import com.service.UserService;
+import java.util.Calendar;
+import java.util.Date;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -29,8 +32,39 @@ public class UserController {
         this.experienceService = s;
     }
 
+    @RequestMapping(value = "/experience", method = RequestMethod.POST)
+    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam Date start, @RequestParam Date end, @RequestParam int user) {
+        //user da togliere e prenderlo direttamente dalla sessione
+        try {
+            experienceService.addExperience(title, genres, role, character, start, end, user);
+            return getUserById(model, user);
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Aggiunta dell' esperienza fallita");
+        }
+        return "response";
+    }
+    
+    @RequestMapping(value = "/test/experience", method = RequestMethod.GET)
+    public String addExperience(Model model) {
+        //user da togliere e prenderlo direttamente dalla sessione
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -30);
+        Date start = cal.getTime();
+        cal.add(Calendar.YEAR, 1);
+        Date end = cal.getTime();
+        try {
+            experienceService.addExperience("Mean Streets", "Gangster", "Regista", null, start, end, 0);
+            return getUserById(model, 0);
+        } catch (ConstraintViolationException e) {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Aggiunta dell' esperienza fallita");
+        }
+        return "response";
+    }
+    
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-    public String getUsersById(Model model, @PathVariable int id) {
+    public String getUserById(Model model, @PathVariable int id) {
         model.addAttribute("user", userService.getUserById(id));
         model.addAttribute("experiences", experienceService.listExperiencesByUser(id));
         return "user";

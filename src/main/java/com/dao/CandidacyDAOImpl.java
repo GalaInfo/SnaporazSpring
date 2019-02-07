@@ -24,8 +24,15 @@ public class CandidacyDAOImpl implements CandidacyDAO {
     }
 
     @Override
-    public void addCandidacy(Candidacy p) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void addCandidacy(Candidacy c) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.save(c);
+    }
+
+    @Override
+    public Candidacy getCandidacyById(int id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        return (Candidacy) session.createCriteria(Candidacy.class).add(Restrictions.eq("id", id)).uniqueResult();
     }
 
     @Override

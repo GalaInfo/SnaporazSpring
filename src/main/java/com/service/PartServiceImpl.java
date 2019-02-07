@@ -19,16 +19,32 @@ public class PartServiceImpl implements PartService {
 
     @Override
     @Transactional
-    public void addPart(Part p) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void addPart(int project, String role, String character) {
+        Part p = new Part();
+        p.setProject(project);
+        p.setRole(role);
+        p.setCharacter(character);
+        p.setUser(null);
+        
+        partDAO.addPart(p);
     }
 
     @Override
     @Transactional
-    public void updatePart(Part p) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void updatePart(int id, int user) {
+        Part p = getPartById(id);
+        if(p.getUser() == null)
+            p.setUser(user);
+        
+        partDAO.updatePart(p);
     }
 
+    @Override
+    @Transactional
+    public Part getPartById(int id) {
+        return partDAO.getPartById(id);
+    }
+    
     @Override
     @Transactional
     public List<Part> listPartsByProject(int id) {

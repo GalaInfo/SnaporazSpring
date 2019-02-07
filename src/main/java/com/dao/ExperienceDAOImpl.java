@@ -25,7 +25,8 @@ public class ExperienceDAOImpl implements ExperienceDAO {
 
     @Override
     public void addExperience(Experience e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Session session = this.sessionFactory.getCurrentSession();
+        session.save(e);
     }
 
     @Override
