@@ -188,7 +188,7 @@ public class ProjectController {
     }
     
     @RequestMapping(value = "/projects/{title}", method = RequestMethod.GET)
-    public String listProjecstByTitle(Model model, @PathVariable String title) {
+    public String listProjectsByTitle(Model model, @PathVariable String title) {
         model.addAttribute("projects", projectService.listProjectsByTitle(title));
         return "projectsList";
     }

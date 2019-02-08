@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="json" uri="http://www.atg.com/taglibs/json" %>
 <json:object>
-    <json:array name="mostFoundedProjects" var="project" items="${mostFoundedProjects}">
+    <json:array name="mostFundedProjects" var="project" items="${mostFoundedProjects}">
         <json:object>
             <json:property name="id" value="${project.id}"/>
             <json:property name="title" value="${project.title}"/>

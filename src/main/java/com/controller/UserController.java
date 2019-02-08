@@ -1,12 +1,23 @@
 package com.controller;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.service.ExperienceService;
 import com.service.UserService;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,11 +36,30 @@ public class UserController {
     public void setUserService(UserService s) {
         this.userService = s;
     }
-    
+
     @Autowired(required = true)
     @Qualifier(value = "experienceService")
     public void setExperienceService(ExperienceService s) {
         this.experienceService = s;
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String login(Model model, @RequestParam String idTokenString) {
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Collections.singletonList(CLIENT_ID)).build();
+        try {
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                Payload payload = idToken.getPayload();
+                model.addAttribute("mail",payload.getEmail());
+            }
+        } catch (GeneralSecurityException ex) {
+            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
+            model.addAttribute("mail","GeneralSecurityError");
+        } catch (IOException ex) {
+            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
+            model.addAttribute("mail","IOException");
+        }
+        return "prova";
     }
 
     @RequestMapping(value = "/experience", method = RequestMethod.POST)
@@ -44,7 +74,7 @@ public class UserController {
         }
         return "response";
     }
-    
+
     @RequestMapping(value = "/test/experience", method = RequestMethod.GET)
     public String addExperience(Model model) {
         //user da togliere e prenderlo direttamente dalla sessione
@@ -62,20 +92,20 @@ public class UserController {
         }
         return "response";
     }
-    
+
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public String getUserById(Model model, @PathVariable int id) {
         model.addAttribute("user", userService.getUserById(id));
         model.addAttribute("experiences", experienceService.listExperiencesByUser(id));
         return "user";
     }
-    
+
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public String advancedUserSearch(Model model, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam int minAge, @RequestParam int maxAge, @RequestParam String project, @RequestParam String genres, @RequestParam String order, @RequestParam boolean asc) {
         model.addAttribute("users", userService.advancedUserSearch(name, surname, roles, minAge, maxAge, project, genres, order, asc));
         return "userList";
     }
-    
+
     @RequestMapping(value = "/test/users", method = RequestMethod.GET)
     public String testAdvancedUserSearch(Model model) {
         model.addAttribute("users", userService.advancedUserSearch("Martin", "Scorsese", null, 0, 100, null, null, null, false));
