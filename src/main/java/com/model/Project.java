@@ -35,8 +35,8 @@ public class Project {
     private String prizes;
     @Column(name = "proprietario")
     private String owner;
-    //ridondanza da aggiungere al DB
-    //private int donations;
+    @Column(name = "donazioni")
+    private int donations;
 
     public int getId() {
         return id;
@@ -75,6 +75,10 @@ public class Project {
     }
 
     public String getPrizes() {
+        return prizes;
+    }
+    
+    public String getDonations() {
         return prizes;
     }
     
@@ -118,6 +122,15 @@ public class Project {
         this.prizes = prizes;
     }
     
+    public void setDonations(int donations) {
+        this.donations = donations;
+    }
+
+    public void donate(double sum) {
+        actual += sum;
+        donations++;
+    }
+
     @Override
     public String toString() {
         return "Project{" + "id=" + id + ", title=" + title + ", genres=" + genres + ", plot=" + plot + ", img=" + img + ", deadLine=" + deadLine + ", actual=" + actual + ", min=" + min + ", owner=" + owner + '}';

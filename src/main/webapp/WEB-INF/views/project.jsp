@@ -12,6 +12,11 @@
     <json:property name="genres" value="${project.genres}"/>
     <json:property name="owner" value="${project.owner}"/>
     <json:property name="image" value="${project.img}"/>
+    <json:property name="prizes" value="${project.prizes}"/>
+    <json:property name="actual" value="${project.actual}"/>
+    <json:property name="min" value="${project.min}"/>
+    <json:property name="deadLine" value="${project.deadLine}"/>
+    <json:property name="donations" value="${project.donations}"/>
     <json:array name="parts" var="part" items="${parts}">
         <json:object>
             <json:property name="id" value="${part.id}"/>

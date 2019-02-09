@@ -12,6 +12,9 @@
     <json:property name="surname" value="${user.surname}"/>
     <json:property name="roles" value="${user.roles}"/>
     <json:property name="image" value="${user.image}"/>
+    <json:property name="birth" value="${user.birth}"/>
+    <json:property name="nation" value="${user.nation}"/>
+    <json:property name="mail" value="${user.mail}"/>
     <json:array name="experiences" var="experience" items="${experiences}">
         <json:object>
             <json:property name="id" value="${experience.id}"/>
@@ -19,6 +22,7 @@
             <json:property name="title" value="${experience.title}"/>
             <json:property name="genres" value="${experience.genres}"/>
             <json:property name="role" value="${experience.role}"/>
+            <json:property name="role" value="${experience.character}"/>
         </json:object>
     </json:array>
 </json:object>
