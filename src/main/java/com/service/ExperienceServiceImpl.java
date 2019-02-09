@@ -20,7 +20,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     @Override
     @Transactional
-    public void addExperience(String title, String genres, String role, String character, Date start, Date end, int user) {
+    public void addExperience(String title, String genres, String role, String character, Date start, Date end, String user) {
         Experience e = new Experience();
         
         e.setTitle(title);
@@ -36,7 +36,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     @Override
     @Transactional
-    public List<Experience> listExperiencesByUser(int id) {
+    public List<Experience> listExperiencesByUser(String id) {
         return experienceDAO.listExperiencesByUser(id);
     }
 

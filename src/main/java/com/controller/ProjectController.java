@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 @Controller
 public class ProjectController {
@@ -51,7 +52,7 @@ public class ProjectController {
     public void setUserService(UserService s) {
         this.userService = s;
     }
-
+    
     @RequestMapping(value = "/")
     public String mainPage(Model model) {
         model.addAttribute("mostFoundedProjects", projectService.listMostFoundedProjects());
@@ -76,12 +77,12 @@ public class ProjectController {
             }
         }
         if(pr != null)
-            model.addAttribute("related", projectService.listRelatedProjects(id, pr.getGenres()));
+            model.addAttribute("related", projectService.listRelatedProjects(pr.getOwner(), pr.getGenres()));
         return "project";
     }
 
     @RequestMapping(value = "/project", method = RequestMethod.POST)
-    public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam int owner) {
+    public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam String owner) {
         try {
             //owner da togliere e prenderlo direttamente dalla sessione
             int projectId = projectService.addProject(title, genres, plot, img, min, prizes, owner);
@@ -96,7 +97,7 @@ public class ProjectController {
     @RequestMapping(value = "/test/project", method = RequestMethod.GET)
     public String addProject(Model model) {
         try {
-            int projectId = projectService.addProject("Quei Bravi Ragazzi", "Dramma", "Bella", "", 1000.0, "Niente", 7);
+            int projectId = projectService.addProject("Quei Bravi Ragazzi", "Dramma", "Bella", "", 1000.0, "Niente", "5");
             return getProjectById(model, projectId);
         } catch (ConstraintViolationException e) {
             model.addAttribute("success", false);
@@ -161,7 +162,7 @@ public class ProjectController {
     }
     
     @RequestMapping(value = "/candidacy", method = RequestMethod.POST)
-    public String addCandidacy(Model model, @RequestParam int part, @RequestParam int user) {
+    public String addCandidacy(Model model, @RequestParam int part, @RequestParam String user) {
         //user da togliere e prenderlo direttamente dalla sessione
         try {
             candidacyService.addCandidacy(part, user);
@@ -177,7 +178,7 @@ public class ProjectController {
     @RequestMapping(value = "/test/candidacy", method = RequestMethod.GET)
     public String addCandidacy(Model model) {
         try {
-            candidacyService.addCandidacy(4, 0);
+            candidacyService.addCandidacy(4, "1");
             Part p = partService.getPartById(4);
             return getProjectById(model, p.getProject());
         } catch (ConstraintViolationException e) {

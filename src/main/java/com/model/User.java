@@ -1,27 +1,23 @@
 
 package com.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 
 @Entity
 @Table(name = "UTENTE")
-public class User {
+public class User implements Serializable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private String id;
     @Column(name = "mail")
     private String mail;
-    @Column(name = "telefono")
-    private String phone;
     @Column(name = "nome")
     private String name;
     @Column(name = "cognome")
@@ -29,25 +25,19 @@ public class User {
     @Column(name = "nascita")
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date birth;
-    @Column(name = "indirizzo")
-    private String address;
+    @Column(name = "nazione")
+    private String nation;
     @Column(name = "ruoli")
     private String roles;
     @Column(name = "immagine")
     private String image;
-    @Column(name = "credito")
-    private String credit;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     public String getMail() {
         return mail;
-    }
-
-    public String getPhone() {
-        return phone;
     }
 
     public String getName() {
@@ -62,8 +52,8 @@ public class User {
         return birth;
     }
 
-    public String getAddress() {
-        return address;
+    public String getNation() {
+        return nation;
     }
 
     public String getRoles() {
@@ -74,20 +64,12 @@ public class User {
         return image;
     }
 
-    public String getCredit() {
-        return credit;
-    }
-
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
     public void setMail(String mail) {
         this.mail = mail;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public void setName(String name) {
@@ -102,8 +84,8 @@ public class User {
         this.birth = birth;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setNation(String nation) {
+        this.nation = nation;
     }
 
     public void setRoles(String roles) {
@@ -112,23 +94,6 @@ public class User {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public void setCredit(String credit) {
-        this.credit = credit;
-    }
-
-    @Override
-    public String toString() {
-        return "Utente{" + "id=" + id + ", mail=" + mail + ", phone=" + phone + ", name=" + name + ", surname=" + surname + ", birth=" + birth + ", address=" + address + ", roles=" + roles + ", image=" + image + ", credit=" + credit + '}';
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + id;
-        return result;
     }
 
     @Override
@@ -143,6 +108,6 @@ public class User {
             return false;
         }
         User other = (User) obj;
-        return id == other.id;
+        return id.equals(other.getId());
     }
 }

@@ -20,7 +20,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public int addProject(String title, String genres, String plot, String img, double min, String prizes, int owner) {
+    public int addProject(String title, String genres, String plot, String img, double min, String prizes, String owner) {
         Project p = new Project();
         p.setTitle(title);
         p.setGenres(genres);
@@ -74,7 +74,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public List<Project> listRelatedProjects(int owner, String genres) {
+    public List<Project> listRelatedProjects(String owner, String genres) {
         return projectDAO.listRelatedProjects(owner, genres);
     }
 

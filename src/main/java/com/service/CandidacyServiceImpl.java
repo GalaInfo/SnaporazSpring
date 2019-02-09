@@ -19,7 +19,7 @@ public class CandidacyServiceImpl implements CandidacyService {
 
     @Override
     @Transactional
-    public void addCandidacy(int part, int user) {
+    public void addCandidacy(int part, String user) {
         Candidacy p = new Candidacy();
         p.setPart(part);
         p.setUser(user);

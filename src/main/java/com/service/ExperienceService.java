@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ExperienceService {
     
-    public void addExperience(String title, String genres, String role, String character, Date start, Date end, int user);
+    public void addExperience(String title, String genres, String role, String character, Date start, Date end, String user);
     
-    public List<Experience> listExperiencesByUser(int id);  
+    public List<Experience> listExperiencesByUser(String id);  
 }

@@ -104,7 +104,7 @@ public class ProjectDAOImpl implements ProjectDAO{
     }
     
     @Override
-    public List<Project> listRelatedProjects(int owner, String genres) {
+    public List<Project> listRelatedProjects(String owner, String genres) {
         Session session = this.sessionFactory.getCurrentSession();        
         Calendar cal = Calendar.getInstance();
         return session.createCriteria(Project.class).add(Restrictions.gt("deadLine", cal.getTime())).add(Restrictions.disjunction().add(Restrictions.eq("owner", owner)).add(Restrictions.like("genres", genres, MatchMode.ANYWHERE))).addOrder(Order.asc("deadLine")).setMaxResults(3).list();

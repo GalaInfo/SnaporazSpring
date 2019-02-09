@@ -19,7 +19,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User getUserById(int id) {
+    public User addUser(String id, String mail, String name, String surname) {
+        User u = new User();
+        u.setId(id);
+        u.setMail(mail);
+        u.setName(name);
+        u.setSurname(surname);
+        userDAO.addUser(u);
+        return u;
+    }
+
+    @Override
+    @Transactional
+    public User getUserById(String id) {
         return userDAO.getUserById(id);
     }
     

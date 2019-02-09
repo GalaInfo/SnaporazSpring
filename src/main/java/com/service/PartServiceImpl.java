@@ -31,7 +31,7 @@ public class PartServiceImpl implements PartService {
 
     @Override
     @Transactional
-    public void updatePart(int id, int user) {
+    public void updatePart(int id, String user) {
         Part p = getPartById(id);
         if(p.getUser() == null)
             p.setUser(user);

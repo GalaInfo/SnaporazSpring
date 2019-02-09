@@ -5,11 +5,11 @@ import java.util.List;
 
 public interface UserDAO {
 
-    public void addUser(User p);
+    public void addUser(User u);
 
-    public void updateUser(User p);
+    public void updateUser(User u);
 
-    public User getUserById(int id);
+    public User getUserById(String id);
 
     public List<User> listUsersBySurname(String surname);
 

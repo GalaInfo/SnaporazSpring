@@ -19,7 +19,7 @@ public class Candidacy {
     @Column(name = "parte")
     private int part;
     @Column(name = "utente")
-    private int user;
+    private String user;
 
     public int getId() {
         return id;
@@ -29,7 +29,7 @@ public class Candidacy {
         return part;
     }
 
-    public int getUser() {
+    public String getUser() {
         return user;
     }
 
@@ -41,7 +41,7 @@ public class Candidacy {
         this.part = part;
     }
 
-    public void setUser(int user) {
+    public void setUser(String user) {
         this.user = user;
     }
 

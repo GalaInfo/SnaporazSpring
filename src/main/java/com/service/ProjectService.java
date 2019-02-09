@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface ProjectService {
     
-    public int addProject(String title, String genres, String plot, String img, double min, String prizes, int owner);
+    public int addProject(String title, String genres, String plot, String img, double min, String prizes, String owner);
 
     public Project getProjectById(int id);
     
@@ -19,5 +19,5 @@ public interface ProjectService {
     
     public List<Project> listClosestProjects();
 
-    public List<Project> listRelatedProjects(int owner, String genres);
+    public List<Project> listRelatedProjects(String owner, String genres);
 }

@@ -16,5 +16,5 @@ public interface ExperienceDAO {
 
     public void addExperience(Experience e);
 
-    public List<Experience> listExperiencesByUser(int id);
+    public List<Experience> listExperiencesByUser(String id);
 }

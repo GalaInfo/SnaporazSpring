@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface CandidacyService {
     
-    public void addCandidacy(int part, int user);
+    public void addCandidacy(int part, String user);
     
     public Candidacy getCandidacyById(int id);
     

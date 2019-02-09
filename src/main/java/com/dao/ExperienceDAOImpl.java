@@ -30,7 +30,7 @@ public class ExperienceDAOImpl implements ExperienceDAO {
     }
 
     @Override
-    public List<Experience> listExperiencesByUser(int id) {
+    public List<Experience> listExperiencesByUser(String id) {
         Session session = this.sessionFactory.getCurrentSession();
         return session.createCriteria(Experience.class).add(Restrictions.eq("user", id)).list();
     }

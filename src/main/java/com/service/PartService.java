@@ -7,7 +7,7 @@ public interface PartService {
     
     public void addPart(int project, String role, String character);
 
-    public void updatePart(int id, int user);
+    public void updatePart(int id, String user);
     
     public Part getPartById(int id);
 

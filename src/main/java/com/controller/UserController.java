@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.model.User;
 import com.service.ExperienceService;
 import com.service.UserService;
 import java.io.IOException;
@@ -14,10 +15,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,26 +46,44 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(Model model, @RequestParam String idTokenString) {
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Collections.singletonList(CLIENT_ID)).build();
+    public String login(HttpServletRequest request, Model model, @RequestParam String idTokenString) {
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Collections.singletonList("617542772314-keo0t31kssvhk31g3ghjhho21m8s53cm.apps.googleusercontent.com")).build();
         try {
             GoogleIdToken idToken = verifier.verify(idTokenString);
             if (idToken != null) {
                 Payload payload = idToken.getPayload();
-                model.addAttribute("mail",payload.getEmail());
+                User u = userService.getUserById(payload.getSubject());
+                if (u == null) {
+                    u = register(payload.getSubject(), payload.get("email").toString(), payload.get("given_name").toString(), payload.get("family_name").toString());
+                }
+                request.getSession().setAttribute("user", u);
             }
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
-            model.addAttribute("mail","GeneralSecurityError");
+            model.addAttribute("mail", "GeneralSecurityError");
         } catch (IOException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
-            model.addAttribute("mail","IOException");
+            model.addAttribute("mail", "IOException");
         }
         return "prova";
     }
 
+    private User register(String id, String mail, String name, String surname) {
+        try {
+            return userService.addUser(id, mail, name, surname);
+        } catch (ConstraintViolationException e) {
+            return null;
+        }
+    }
+    
+    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    public String info(Model model, HttpServletRequest request) {
+        System.out.println(request.getSession().getAttribute("user"));
+        return "prova";
+    }
+
     @RequestMapping(value = "/experience", method = RequestMethod.POST)
-    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam Date start, @RequestParam Date end, @RequestParam int user) {
+    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam Date start, @RequestParam Date end, @RequestParam String user) {
         //user da togliere e prenderlo direttamente dalla sessione
         try {
             experienceService.addExperience(title, genres, role, character, start, end, user);
@@ -84,8 +104,8 @@ public class UserController {
         cal.add(Calendar.YEAR, 1);
         Date end = cal.getTime();
         try {
-            experienceService.addExperience("Mean Streets", "Gangster", "Regista", null, start, end, 0);
-            return getUserById(model, 0);
+            experienceService.addExperience("Mean Streets", "Gangster", "Regista", null, start, end, "0");
+            return getUserById(model, "0");
         } catch (ConstraintViolationException e) {
             model.addAttribute("success", false);
             model.addAttribute("response", "Aggiunta dell' esperienza fallita");
@@ -94,7 +114,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-    public String getUserById(Model model, @PathVariable int id) {
+    public String getUserById(Model model, @PathVariable String id) {
         model.addAttribute("user", userService.getUserById(id));
         model.addAttribute("experiences", experienceService.listExperiencesByUser(id));
         return "user";

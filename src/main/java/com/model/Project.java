@@ -34,7 +34,7 @@ public class Project {
     @Column(name = "premi")
     private String prizes;
     @Column(name = "proprietario")
-    private int owner;
+    private String owner;
     //ridondanza da aggiungere al DB
     //private int donations;
 
@@ -70,7 +70,7 @@ public class Project {
         return min;
     }
 
-    public int getOwner() {
+    public String getOwner() {
         return owner;
     }
 
@@ -110,7 +110,7 @@ public class Project {
         this.min = min;
     }
 
-    public void setOwner(int owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 

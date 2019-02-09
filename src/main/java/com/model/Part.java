@@ -21,7 +21,7 @@ public class Part {
     @Column(name = "personaggio")
     private String character;
     @Column(name = "utente")
-    private Integer user;
+    private String user;
     @Column(name = "progetto")
     private int project;
 
@@ -37,7 +37,7 @@ public class Part {
         return character;
     }
 
-    public Integer getUser() {
+    public String getUser() {
         return user;
     }
 
@@ -57,7 +57,7 @@ public class Part {
         this.character = character;
     }
 
-    public void setUser(Integer user) {
+    public void setUser(String user) {
         this.user = user;
     }
 

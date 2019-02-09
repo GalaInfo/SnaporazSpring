@@ -30,7 +30,7 @@ public class Experience {
     @Column(name = "fine")
     private Date end;
     @Column(name = "utente")
-    private int user;
+    private String user;
 
     public int getId() {
         return id;
@@ -60,7 +60,7 @@ public class Experience {
         return end;
     }
 
-    public int getUser() {
+    public String getUser() {
         return user;
     }
 
@@ -92,7 +92,7 @@ public class Experience {
         this.end = end;
     }
 
-    public void setUser(int user) {
+    public void setUser(String user) {
         this.user = user;
     }
 

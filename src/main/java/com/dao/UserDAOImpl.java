@@ -23,8 +23,9 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void addUser(User p) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void addUser(User u) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.save(u);
     }
 
     @Override
@@ -34,11 +35,11 @@ public class UserDAOImpl implements UserDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public User getUserById(int id) {
+    public User getUserById(String id) {
         Session session = this.sessionFactory.getCurrentSession();
         return (User) session.createCriteria(User.class).add(Restrictions.eq("id", id)).uniqueResult();
     }
-
+    
     @SuppressWarnings("unchecked")
     @Override
     public List<User> listUsersBySurname(String surname) {
@@ -51,7 +52,7 @@ public class UserDAOImpl implements UserDAO {
     public List<User> advancedUserSearch(String name, String surname, String roles, int minAge, int maxAge, String project, String genres, String order, boolean asc) {
         Session session = this.sessionFactory.getCurrentSession();
         String hql = "SELECT DISTINCT u FROM User u";
-        hql += roles != null || project != null || genres != null ? ", Experience e WHERE u.id = e.user AND e.role LIKE :role AND e.title LIKE :project AND e.genres LIKE :genres" : " WHERE 1 = 1";
+        hql += !roles.isEmpty() || !project.isEmpty() || !genres.isEmpty() ? ", Experience e WHERE u.id = e.user AND e.role LIKE :role AND e.title LIKE :project AND e.genres LIKE :genres" : " WHERE 1 = 1";
         
         hql += " AND u.name LIKE :name AND u.surname LIKE :surname AND u.birth >= :minBirth AND u.birth <= :maxBirth ORDER BY ";
         
@@ -60,11 +61,11 @@ public class UserDAOImpl implements UserDAO {
                 
         Query q = session.createQuery(hql);
         
-        if(name != null)
+        if(!name.isEmpty())
             q.setString("name", "%" + name + "%");
         else
             q.setString("name", "%%");
-        if(surname != null)
+        if(!surname.isEmpty())
             q.setString("surname", "%" + surname + "%");
         else
             q.setString("surname", "%%");
@@ -75,16 +76,16 @@ public class UserDAOImpl implements UserDAO {
         cal.add(Calendar.YEAR, maxAge - minAge);
         q.setDate("maxBirth", cal.getTime());
 
-        if(roles != null || project != null || genres != null){
-            if(roles != null)
+        if(!roles.isEmpty() || !project.isEmpty() || !genres.isEmpty()){
+            if(!roles.isEmpty())
                 q.setString("role", "%" + roles + "%");
             else
                 q.setString("role", "%%");
-            if(project != null)
+            if(!project.isEmpty())
                 q.setString("project", "%" + project + "%");
             else
                 q.setString("project", "%%");
-            if(genres != null)
+            if(!genres.isEmpty())
                 q.setString("genres", "%" + genres + "%");
             else
                 q.setString("genres", "%%");
