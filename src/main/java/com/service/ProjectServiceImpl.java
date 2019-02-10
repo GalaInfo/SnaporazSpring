@@ -74,8 +74,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public List<Project> listRelatedProjects(String owner, String genres) {
-        return projectDAO.listRelatedProjects(owner, genres);
+    public List<Project> listRelatedProjects(Project p) {
+        return projectDAO.listRelatedProjects(p);
     }
 
 }

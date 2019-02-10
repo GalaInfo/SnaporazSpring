@@ -19,5 +19,5 @@ public interface ProjectService {
     
     public List<Project> listClosestProjects();
 
-    public List<Project> listRelatedProjects(String owner, String genres);
+    public List<Project> listRelatedProjects(Project p);
 }

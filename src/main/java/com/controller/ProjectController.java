@@ -77,7 +77,7 @@ public class ProjectController {
             }
         }
         if(pr != null)
-            model.addAttribute("related", projectService.listRelatedProjects(pr.getOwner(), pr.getGenres()));
+            model.addAttribute("related", projectService.listRelatedProjects(pr));
         return "project";
     }
 
