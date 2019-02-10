@@ -15,7 +15,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(HttpServletRequest request, Model model, @RequestParam String idTokenString) {
+    public String login(HttpSession session, HttpServletResponse response, Model model, @RequestParam String idTokenString) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Collections.singletonList("617542772314-keo0t31kssvhk31g3ghjhho21m8s53cm.apps.googleusercontent.com")).build();
         try {
             GoogleIdToken idToken = verifier.verify(idTokenString);
@@ -56,7 +57,8 @@ public class UserController {
                 if (u == null) {
                     u = register(payload.getSubject(), payload.get("email").toString(), payload.get("given_name").toString(), payload.get("family_name").toString());
                 }
-                request.getSession().setAttribute("user", u);
+                System.out.println("Session:" + session.getId());
+                session.setAttribute("user", u);
             }
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,8 +79,8 @@ public class UserController {
     }
     
     @RequestMapping(value = "/info", method = RequestMethod.GET)
-    public String info(Model model, HttpServletRequest request) {
-        System.out.println(request.getSession().getAttribute("user"));
+    public String info(Model model, HttpSession session) {
+        System.out.println("Session: " + session.getId());
         return "prova";
     }
 
