@@ -44,7 +44,7 @@ public class ProjectDAOImpl implements ProjectDAO{
     public List<Project> advancedProjectSearch(String title, String owner, String genre, String collab, String order, boolean asc) {
         Session session = this.sessionFactory.getCurrentSession();
         String hql = "SELECT DISTINCT pr FROM Project pr, User o";
-        hql += collab != null ? ", User u, Part pa WHERE pr.id = pa.project AND u.id = pa.user AND  u.surname LIKE :collab" : " WHERE 1 = 1";
+        hql += !collab.isEmpty() ? ", User u, Part pa WHERE pr.id = pa.project AND u.id = pa.user AND  u.surname LIKE :collab" : " WHERE 1 = 1";
         
         hql += " AND o.id = pr.owner AND pr.title LIKE :title AND o.surname LIKE :owner AND pr.genres LIKE :genre ORDER BY ";
         
@@ -53,19 +53,10 @@ public class ProjectDAOImpl implements ProjectDAO{
                 
         Query q = session.createQuery(hql);
         
-        if(title != null)
-            q.setString("title", "%" + title + "%");
-        else
-            q.setString("title", "%%");
-        if(owner != null)
-            q.setString("owner", "%" + owner + "%");
-        else
-            q.setString("owner", "%%");
-        if(genre != null)
-            q.setString("genre", "%" + genre + "%");
-        else
-            q.setString("genre", "%%");
-        if(collab != null){
+        q.setString("title", "%" + title + "%");
+        q.setString("owner", "%" + owner + "%");
+        q.setString("genre", "%" + genre + "%");
+        if(!collab.isEmpty()){
             q.setString("collab", "%" + collab + "%");
         }
         

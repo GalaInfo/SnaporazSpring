@@ -61,14 +61,8 @@ public class UserDAOImpl implements UserDAO {
                 
         Query q = session.createQuery(hql);
         
-        if(!name.isEmpty())
-            q.setString("name", "%" + name + "%");
-        else
-            q.setString("name", "%%");
-        if(!surname.isEmpty())
-            q.setString("surname", "%" + surname + "%");
-        else
-            q.setString("surname", "%%");
+        q.setString("name", "%" + name + "%");
+        q.setString("surname", "%" + surname + "%");
         
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, -maxAge);
@@ -77,18 +71,9 @@ public class UserDAOImpl implements UserDAO {
         q.setDate("maxBirth", cal.getTime());
 
         if(!roles.isEmpty() || !project.isEmpty() || !genres.isEmpty()){
-            if(!roles.isEmpty())
-                q.setString("role", "%" + roles + "%");
-            else
-                q.setString("role", "%%");
-            if(!project.isEmpty())
-                q.setString("project", "%" + project + "%");
-            else
-                q.setString("project", "%%");
-            if(!genres.isEmpty())
-                q.setString("genres", "%" + genres + "%");
-            else
-                q.setString("genres", "%%");
+            q.setString("role", "%" + roles + "%");
+            q.setString("project", "%" + project + "%");
+            q.setString("genres", "%" + genres + "%");
         }
         
         return q.list();
