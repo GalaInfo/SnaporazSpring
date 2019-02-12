@@ -81,6 +81,21 @@ public class ProjectController {
         return "project";
     }
 
+    @RequestMapping(value = "/genres", method = RequestMethod.GET)
+    public String getGenres() {
+        return "movieGenres";
+    }
+    
+    @RequestMapping(value = "/troupe", method = RequestMethod.GET)
+    public String getTroupe() {
+        return "troupeList";
+    }
+    
+    @RequestMapping(value = "/cast", method = RequestMethod.GET)
+    public String getCast() {
+        return "castList";
+    }
+    
     @RequestMapping(value = "/project", method = RequestMethod.POST)
     public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam String owner) {
         try {

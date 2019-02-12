@@ -44,9 +44,9 @@ public class ProjectDAOImpl implements ProjectDAO{
     public List<Project> advancedProjectSearch(String title, String owner, String genre, String collab, String order, boolean asc) {
         Session session = this.sessionFactory.getCurrentSession();
         String hql = "SELECT DISTINCT pr FROM Project pr, User o";
-        hql += !collab.isEmpty() ? ", User u, Part pa WHERE pr.id = pa.project AND u.id = pa.user AND u.surname ILIKE :collab" : " WHERE 1 = 1";
+        hql += !collab.isEmpty() ? ", User u, Part pa WHERE pr.id = pa.project AND u.id = pa.user AND lower(u.surname) LIKE lower(:collab)" : " WHERE 1 = 1";
         
-        hql += " AND o.id = pr.owner AND pr.title ILIKE :title AND o.surname ILIKE :owner AND pr.genres ILIKE :genre ORDER BY ";
+        hql += " AND o.id = pr.owner AND lower(pr.title) LIKE lower(:title) AND lower(o.surname) LIKE lower(:owner) AND pr.genres LIKE :genre ORDER BY ";
         
         hql += "title".equals(order) ? "pr.title" : "pr.actual";
         hql += asc ? " ASC" : " DESC";

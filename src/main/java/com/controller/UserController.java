@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(HttpSession session, HttpServletResponse response, Model model, @RequestParam String idTokenString) {
+    public String login(Model model, @RequestParam String idTokenString) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Collections.singletonList("617542772314-keo0t31kssvhk31g3ghjhho21m8s53cm.apps.googleusercontent.com")).build();
         try {
             GoogleIdToken idToken = verifier.verify(idTokenString);
@@ -57,8 +57,7 @@ public class UserController {
                 if (u == null) {
                     u = register(payload.getSubject(), payload.get("email").toString(), payload.get("given_name").toString(), payload.get("family_name").toString());
                 }
-                System.out.println("Session:" + session.getId());
-                session.setAttribute("user", u);
+                model.addAttribute("user", u);
             }
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);

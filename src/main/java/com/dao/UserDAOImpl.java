@@ -52,9 +52,9 @@ public class UserDAOImpl implements UserDAO {
     public List<User> advancedUserSearch(String name, String surname, String roles, int minAge, int maxAge, String project, String genres, String order, boolean asc) {
         Session session = this.sessionFactory.getCurrentSession();
         String hql = "SELECT DISTINCT u FROM User u";
-        hql += !roles.isEmpty() || !project.isEmpty() || !genres.isEmpty() ? ", Experience e WHERE u.id = e.user AND e.role ILIKE :role AND e.title ILIKE :project AND e.genres LIKE :genres" : " WHERE 1 = 1";
+        hql += !roles.isEmpty() || !project.isEmpty() || !genres.isEmpty() ? ", Experience e WHERE u.id = e.user AND e.role LIKE :role AND lower(e.title) LIKE lower(:project) AND e.genres LIKE :genres" : " WHERE 1 = 1";
         
-        hql += " AND u.name ILIKE :name AND u.surname ILIKE :surname AND u.birth >= :minBirth AND u.birth <= :maxBirth ORDER BY ";
+        hql += " AND lower(u.name) LIKE lowe(:name) AND lower(u.surname) LIKE lower(:surname) AND u.birth >= :minBirth AND u.birth <= :maxBirth ORDER BY ";
         
         hql += "surname".equals(order) ? "u.surname" : "u.birth";
         hql += asc ? " ASC" : " DESC";
