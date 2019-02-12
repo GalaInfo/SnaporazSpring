@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.extra.GoogleVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -48,23 +49,14 @@ public class UserController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(Model model, @RequestParam String idTokenString) {
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Collections.singletonList("617542772314-keo0t31kssvhk31g3ghjhho21m8s53cm.apps.googleusercontent.com")).build();
-        try {
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken != null) {
-                Payload payload = idToken.getPayload();
-                User u = userService.getUserById(payload.getSubject());
-                if (u == null) {
-                    u = register(payload.getSubject(), payload.get("email").toString(), payload.get("given_name").toString(), payload.get("family_name").toString());
-                }
-                model.addAttribute("user", u);
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if (idToken != null) {
+            Payload payload = idToken.getPayload();
+            User u = userService.getUserById(payload.getSubject());
+            if (u == null) {
+                u = register(payload.getSubject(), payload.get("email").toString(), payload.get("given_name").toString(), payload.get("family_name").toString());
             }
-        } catch (GeneralSecurityException ex) {
-            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
-            model.addAttribute("mail", "GeneralSecurityError");
-        } catch (IOException ex) {
-            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
-            model.addAttribute("mail", "IOException");
+            model.addAttribute("user", u);
         }
         return "prova";
     }
@@ -76,19 +68,14 @@ public class UserController {
             return null;
         }
     }
-    
-    @RequestMapping(value = "/info", method = RequestMethod.GET)
-    public String info(Model model, HttpSession session) {
-        System.out.println("Session: " + session.getId());
-        return "prova";
-    }
 
     @RequestMapping(value = "/experience", method = RequestMethod.POST)
-    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam Date start, @RequestParam Date end, @RequestParam String user) {
-        //user da togliere e prenderlo direttamente dalla sessione
+    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam Date start, @RequestParam Date end, @RequestParam String idTokenString) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         try {
-            experienceService.addExperience(title, genres, role, character, start, end, user);
-            return getUserById(model, user);
+            String userId = idToken.getPayload().getSubject();
+            experienceService.addExperience(title, genres, role, character, start, end, userId);
+            return getUserById(model, userId);
         } catch (ConstraintViolationException e) {
             model.addAttribute("success", false);
             model.addAttribute("response", "Aggiunta dell' esperienza fallita");
