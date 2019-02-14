@@ -23,12 +23,10 @@
             <json:property name="role" value="${part.role}"/>
             <json:property name="character" value="${part.character}"/>
             <c:set var="userId" value="user${part.user}"/>
-            <json:object name="user">
-                <json:property name="id" value="${requestScope[userId].id}"/>
-                <json:property name="name" value="${requestScope[userId].name}"/>
-                <json:property name="surname" value="${requestScope[userId].surname}"/>
-                <json:property name="img" value="${requestScope[userId].img}"/>
-            </json:object>
+            <json:property name="userId" value="${requestScope[userId].id}"/>
+            <json:property name="name" value="${requestScope[userId].name}"/>
+            <json:property name="surname" value="${requestScope[userId].surname}"/>
+            <json:property name="img" value="${requestScope[userId].img}"/>
             <c:set var="partId" value="part${part.id}"/>
             <json:array name="candidates" var="cand" items="${requestScope[partId]}">
                 <json:object>

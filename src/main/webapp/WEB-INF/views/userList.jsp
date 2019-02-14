@@ -10,7 +10,7 @@
       <json:property name="id" value="${user.id}"/>
       <json:property name="name" value="${user.name}"/>
       <json:property name="surname" value="${user.surname}"/>
-      <json:property name="roles" value="${user.roles}"/>
+      <json:property name="role" value="${user.roles}"/>
       <json:property name="image" value="${user.image}"/>
     </json:object>
   </json:array>
