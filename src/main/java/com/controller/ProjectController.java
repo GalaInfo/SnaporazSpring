@@ -1,5 +1,7 @@
 package com.controller;
 
+import com.extra.GoogleVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.model.Candidacy;
 import com.model.Part;
 import com.model.Project;
@@ -9,8 +11,12 @@ import com.service.PartService;
 import com.service.ProjectService;
 import com.service.UserService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import org.hibernate.exception.ConstraintViolationException;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -19,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 @Controller
 public class ProjectController {
@@ -28,6 +33,9 @@ public class ProjectController {
     private PartService partService;
     private CandidacyService candidacyService;
     private UserService userService;
+    private final String[] genres = {"Animazione", "Avventura", "Biografico", "Commedia", "Documentario", "Drammatico", "Erotico", "Fantascienza", "Fantasy/Fantastico", "Guerra", "Horror", "Musical", "Storico", "Thriller", "Western"};
+    private final String[] cast = {"Attore Protagonista", "Attrice Protagonista", "Attore non Protagonista", "Attrice non Protagonista", "Comparsa", "Doppiatore"};
+    private final String[] troupe = {"Regista", "Aiuto Regista", "Assistente alla Regia", "Sceneggiatore", "Segretario di Edizione", "Direttore della Fotografia", "Operatore alla Macchina", "Assistente Operatore", "Capo Elettricista", "Elettricista", "Capo Macchinista", "Macchinista", "Costumista", "Capo Truccatore", "Truccatore", "Scenografo", "Fonico", "Microfonista", "Compositore", "Direttore del Montaggio", "Addetto al Montaggio"};
 
     @Autowired(required = true)
     @Qualifier(value = "projectService")
@@ -52,7 +60,7 @@ public class ProjectController {
     public void setUserService(UserService s) {
         this.userService = s;
     }
-    
+
     @RequestMapping(value = "/")
     public String mainPage(Model model) {
         model.addAttribute("mostFoundedProjects", projectService.listMostFoundedProjects());
@@ -62,147 +70,143 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/project/{id}", method = RequestMethod.GET)
-    public String getProjectById(Model model, @PathVariable int id) {
+    public String getProjectById(Model model, @PathVariable int id, @PathVariable String idTokenString) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         Project pr = projectService.getProjectById(id);
-        model.addAttribute("project", pr);
-        List<Part> parts = partService.listPartsByProject(id);
-        model.addAttribute("parts", parts);
-        for (Part p : parts) {
-            if (p.getUser() == null) {
-                List<User> users = new ArrayList<>();
-                for (Candidacy c : candidacyService.listCandidaciesByPart(p.getId())) {
-                    users.add(userService.getUserById(c.getUser()));
+        if (pr != null) {
+            model.addAttribute("project", pr);
+            List<Part> parts = partService.listPartsByProject(id);
+            model.addAttribute("parts", parts);
+            for (Part p : parts) {
+                if ("".equals(p.getUser()) && idToken != null && idToken.getPayload().getSubject().equals(pr.getOwner())) {
+                    List<User> users = new ArrayList<>();
+                    for (Candidacy c : candidacyService.listCandidaciesByPart(p.getId())) {
+                        users.add(userService.getUserById(c.getUser()));
+                    }
+                    model.addAttribute("part" + p.getId(), users);
+                } else if (!"".equals(p.getUser())) {
+                    model.addAttribute("user" + p.getUser(), userService.getUserById(p.getUser()));
                 }
-                model.addAttribute("part" + p.getId(), users);
             }
-        }
-        if(pr != null)
+            model.addAttribute("days", Days.daysBetween(new DateTime(), new DateTime(pr.getDeadLine())).getDays());
             model.addAttribute("related", projectService.listRelatedProjects(pr));
+        }
         return "project";
     }
 
     @RequestMapping(value = "/genres", method = RequestMethod.GET)
-    public String getGenres() {
-        return "movieGenres";
-    }
-    
-    @RequestMapping(value = "/troupe", method = RequestMethod.GET)
-    public String getTroupe() {
-        return "troupeList";
-    }
-    
-    @RequestMapping(value = "/cast", method = RequestMethod.GET)
-    public String getCast() {
-        return "castList";
-    }
-    
-    @RequestMapping(value = "/project", method = RequestMethod.POST)
-    public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam String owner) {
-        try {
-            //owner da togliere e prenderlo direttamente dalla sessione
-            int projectId = projectService.addProject(title, genres, plot, img, min, prizes, owner);
-            return getProjectById(model, projectId);
-        } catch (ConstraintViolationException e) {
-            model.addAttribute("success", false);
-            model.addAttribute("response", "Creazione del progetto fallita");
-        }
-        return "response";
+    public String getGenres(Model model) {
+        model.addAttribute("list", genres);
+        return "list";
     }
 
-    @RequestMapping(value = "/test/project", method = RequestMethod.GET)
-    public String addProject(Model model) {
-        try {
-            int projectId = projectService.addProject("Quei Bravi Ragazzi", "Dramma", "Bella", "", 1000.0, "Niente", "5");
-            return getProjectById(model, projectId);
-        } catch (ConstraintViolationException e) {
+    @RequestMapping(value = "/troupe", method = RequestMethod.GET)
+    public String getTroupe(Model model) {
+        model.addAttribute("list", troupe);
+        return "list";
+    }
+
+    @RequestMapping(value = "/cast", method = RequestMethod.GET)
+    public String getCast(Model model) {
+        model.addAttribute("list", cast);
+        return "list";
+    }
+
+    @RequestMapping(value = "/roles", method = RequestMethod.GET)
+    public String getRoles(Model model) {
+        List<String> roles = new ArrayList<>();
+        roles.addAll(Arrays.asList(cast));
+        roles.addAll(Arrays.asList(troupe));
+        model.addAttribute("list", roles);
+        return "list";
+    }
+
+    @RequestMapping(value = "/project", method = RequestMethod.POST)
+    public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam String idTokenString) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if (idToken != null) {
+            try {
+                int projectId = projectService.addProject(title, genres, plot, img, min, prizes, idToken.getPayload().getSubject());
+                return getProjectById(model, projectId, idTokenString);
+            } catch (ConstraintViolationException e) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Creazione del progetto fallita");
+            }
+        } else {
             model.addAttribute("success", false);
-            model.addAttribute("response", "Creazione del progetto fallita");
+            model.addAttribute("response", "Creazione del progetto fallita: login non effettuato");
         }
         return "response";
     }
 
     @RequestMapping(value = "/part", method = RequestMethod.POST)
-    public String addPart(Model model, @RequestParam int project, @RequestParam String role, @RequestParam String character) {
-        try {
-            partService.addPart(project, role, character);
-            return getProjectById(model, project);
-        } catch (ConstraintViolationException e) {
+    public String addPart(Model model, @RequestParam int project, @RequestParam String role, @RequestParam String character, @RequestParam String idTokenString) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if (idToken != null) {
+            try {
+                Project pr = projectService.getProjectById(project);
+                if (pr != null && pr.getOwner().equals(idToken.getPayload().getSubject())) {
+                    partService.addPart(project, role, character);
+                    return getProjectById(model, project, idTokenString);
+                } else {
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Creazione della parte fallita: non sei il proprietario del progetto");
+                }
+            } catch (ConstraintViolationException e) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Creazione della parte fallita");
+            }
+        } else {
             model.addAttribute("success", false);
-            model.addAttribute("response", "Creazione della parte fallita");
+            model.addAttribute("response", "Creazione della parte fallita: login non effettuato");
         }
         return "response";
     }
 
-    @RequestMapping(value = "/test/part", method = RequestMethod.GET)
-    public String addPart(Model model) {
-        try {
-            partService.addPart(0, "Attore Protagonista", "Jake La Motta");
-            return getProjectById(model, 0);
-        } catch (ConstraintViolationException e) {
-            model.addAttribute("success", false);
-            model.addAttribute("response", "Creazione della parte fallita");
-        }
-        return "response";
-    }
-    
     @RequestMapping(value = "/assign", method = RequestMethod.POST)
-    public String addPart(Model model, @RequestParam int candidacy) {
-        //solo se lo user della sessione è il proprietario del progetto
-        try {
-            Candidacy c = candidacyService.getCandidacyById(candidacy);
-            partService.updatePart(c.getPart(), c.getUser());
-            int project = partService.getPartById(c.getPart()).getProject();
-            return getProjectById(model, project);
-        } catch (ConstraintViolationException e) {
+    public String assignPart(Model model, @RequestParam int candidacy, @RequestParam String idTokenString) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if (idToken != null) {
+            try {
+                Candidacy c = candidacyService.getCandidacyById(candidacy);
+                Project pr = projectService.getProjectById(partService.getPartById(c.getPart()).getProject());
+                if (pr != null && pr.getOwner().equals(idToken.getPayload().getSubject())) {
+                    partService.updatePart(c.getPart(), c.getUser());
+                    return getProjectById(model, pr.getId(), idTokenString);
+                } else {
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Assegnazione della parte fallita: non sei il proprietario del progetto");
+                }
+            } catch (ConstraintViolationException e) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Assegnamento della parte fallita");
+            }
+        } else {
             model.addAttribute("success", false);
-            model.addAttribute("response", "Assegnamento della parte fallita");
+            model.addAttribute("response", "Assegnazione della parte fallita: login non effettuato");
         }
         return "response";
     }
-    
-    //test
-    @RequestMapping(value = "/assign", method = RequestMethod.GET)
-    public String assign(Model model) {
-        //solo se lo user della sessione è il proprietario del progetto
-        try {
-            Candidacy c = candidacyService.getCandidacyById(0);
-            partService.updatePart(c.getPart(), c.getUser());
-            int project = partService.getPartById(c.getPart()).getProject();
-            return getProjectById(model, project);
-        } catch (ConstraintViolationException e) {
-            model.addAttribute("success", false);
-            model.addAttribute("response", "Assegnamento della parte fallita");
-        }
-        return "response";
-    }
-    
+
     @RequestMapping(value = "/candidacy", method = RequestMethod.POST)
-    public String addCandidacy(Model model, @RequestParam int part, @RequestParam String user) {
-        //user da togliere e prenderlo direttamente dalla sessione
-        try {
-            candidacyService.addCandidacy(part, user);
-            Part p = partService.getPartById(part);
-            return getProjectById(model, p.getProject());
-        } catch (ConstraintViolationException e) {
+    public String addCandidacy(Model model, @RequestParam int part, @RequestParam String idTokenString) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if (idToken != null) {
+            try {
+                candidacyService.addCandidacy(part, idToken.getPayload().getSubject());
+                Part p = partService.getPartById(part);
+                return getProjectById(model, p.getProject(), idTokenString);
+            } catch (ConstraintViolationException e) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Creazione della candidatura fallita");
+            }
+        } else {
             model.addAttribute("success", false);
-            model.addAttribute("response", "Creazione della candidatura fallita");
+            model.addAttribute("response", "Creazione della candidatura fallita: login non effettuato");
         }
         return "response";
     }
-    
-    @RequestMapping(value = "/test/candidacy", method = RequestMethod.GET)
-    public String addCandidacy(Model model) {
-        try {
-            candidacyService.addCandidacy(4, "1");
-            Part p = partService.getPartById(4);
-            return getProjectById(model, p.getProject());
-        } catch (ConstraintViolationException e) {
-            model.addAttribute("success", false);
-            model.addAttribute("response", "Creazione della candidatura fallita");
-        }
-        return "response";
-    }
-    
+
     @RequestMapping(value = "/projects/{title}", method = RequestMethod.GET)
     public String listProjectsByTitle(Model model, @PathVariable String title) {
         model.addAttribute("projects", projectService.listProjectsByTitle(title));

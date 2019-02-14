@@ -15,17 +15,22 @@
     <json:property name="prizes" value="${project.prizes}"/>
     <json:property name="actual" value="${project.actual}"/>
     <json:property name="min" value="${project.min}"/>
-    <json:property name="deadLine" value="${project.deadLine}"/>
+    <json:property name="days" value="${days}"/>
     <json:property name="donations" value="${project.donations}"/>
     <json:array name="parts" var="part" items="${parts}">
         <json:object>
             <json:property name="id" value="${part.id}"/>
             <json:property name="role" value="${part.role}"/>
             <json:property name="character" value="${part.character}"/>
-            <json:property name="user" value="${part.user}"/>
-            <json:property name="project" value="${part.project}"/>
-            <c:set var="id" value="part${part.id}"/>
-            <json:array name="candidates" var="cand" items="${requestScope[id]}">
+            <c:set var="userId" value="user${part.user}"/>
+            <json:object name="user">
+                <json:property name="id" value="${requestScope[userId].id}"/>
+                <json:property name="name" value="${requestScope[userId].name}"/>
+                <json:property name="surname" value="${requestScope[userId].surname}"/>
+                <json:property name="img" value="${requestScope[userId].img}"/>
+            </json:object>
+            <c:set var="partId" value="part${part.id}"/>
+            <json:array name="candidates" var="cand" items="${requestScope[partId]}">
                 <json:object>
                     <json:property name="id" value="${cand.id}"/>
                     <json:property name="name" value="${cand.name}"/>
@@ -39,8 +44,9 @@
             <json:property name="id" value="${rel.id}"/>
             <json:property name="title" value="${rel.title}"/>
             <json:property name="genres" value="${rel.genres}"/>
-            <json:property name="owner" value="${rel.owner}"/>
             <json:property name="image" value="${rel.img}"/>
+            <json:property name="acrual" value="${rel.actual}"/>
+            <json:property name="min" value="${rel.min}"/>
         </json:object>
     </json:array>
 </json:object>
