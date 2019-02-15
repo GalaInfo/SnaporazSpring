@@ -26,7 +26,7 @@
             <json:property name="userId" value="${requestScope[userId].id}"/>
             <json:property name="name" value="${requestScope[userId].name}"/>
             <json:property name="surname" value="${requestScope[userId].surname}"/>
-            <json:property name="img" value="${requestScope[userId].img}"/>
+            <json:property name="image" value="${requestScope[userId].image}"/>
             <c:set var="partId" value="part${part.id}"/>
             <json:array name="candidates" var="cand" items="${requestScope[partId]}">
                 <json:object>
@@ -43,7 +43,7 @@
             <json:property name="title" value="${rel.title}"/>
             <json:property name="genres" value="${rel.genres}"/>
             <json:property name="image" value="${rel.img}"/>
-            <json:property name="acrual" value="${rel.actual}"/>
+            <json:property name="actual" value="${rel.actual}"/>
             <json:property name="min" value="${rel.min}"/>
         </json:object>
     </json:array>

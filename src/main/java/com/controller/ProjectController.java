@@ -69,8 +69,8 @@ public class ProjectController {
         return "home";
     }
 
-    @RequestMapping(value = "/project/{id}", method = RequestMethod.GET)
-    public String getProjectById(Model model, @PathVariable int id, @PathVariable String idTokenString) {
+    @RequestMapping(value = "/project", method = RequestMethod.POST)
+    public String getProjectById(Model model, @RequestParam int id, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         Project pr = projectService.getProjectById(id);
         if (pr != null) {
@@ -121,7 +121,7 @@ public class ProjectController {
         return "list";
     }
 
-    @RequestMapping(value = "/project", method = RequestMethod.POST)
+    @RequestMapping(value = "/newProject", method = RequestMethod.POST)
     public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken != null) {
