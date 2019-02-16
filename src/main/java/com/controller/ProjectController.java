@@ -77,8 +77,10 @@ public class ProjectController {
             model.addAttribute("project", pr);
             List<Part> parts = partService.listPartsByProject(id);
             model.addAttribute("parts", parts);
+            boolean owner = idToken != null && idToken.getPayload().getSubject().equals(pr.getOwner());
+            model.addAttribute("owner", owner);
             for (Part p : parts) {
-                if ("".equals(p.getUser()) && idToken != null && idToken.getPayload().getSubject().equals(pr.getOwner())) {
+                if ("".equals(p.getUser()) && owner) {
                     List<User> users = new ArrayList<>();
                     for (Candidacy c : candidacyService.listCandidaciesByPart(p.getId())) {
                         users.add(userService.getUserById(c.getUser()));
