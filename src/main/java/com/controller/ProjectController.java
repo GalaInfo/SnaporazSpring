@@ -60,6 +60,12 @@ public class ProjectController {
     public void setUserService(UserService s) {
         this.userService = s;
     }
+    
+    private void addPartProperties(Model model, Part part){
+        model.addAttribute("part", part);
+        model.addAttribute("user", userService.getUserById(part.getUser()));
+        model.addAttribute("candidates", candidacyService.listCandidaciesByPart(part.getId()));
+    }
 
     @RequestMapping(value = "/")
     public String mainPage(Model model) {
@@ -128,7 +134,9 @@ public class ProjectController {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken != null) {
             try {
-                int projectId = projectService.addProject(title, genres, plot, img, min, prizes, idToken.getPayload().getSubject());
+                String owner = idToken.getPayload().getSubject();
+                int projectId = projectService.addProject(title, genres, plot, img, min, prizes, owner);
+                partService.addPart(projectId, owner, "Proprietario", "");                
                 return getProjectById(model, projectId, idTokenString);
             } catch (ConstraintViolationException e) {
                 model.addAttribute("success", false);
@@ -148,8 +156,8 @@ public class ProjectController {
             try {
                 Project pr = projectService.getProjectById(project);
                 if (pr != null && pr.getOwner().equals(idToken.getPayload().getSubject())) {
-                    partService.addPart(project, role, character);
-                    return getProjectById(model, project, idTokenString);
+                    addPartProperties(model, partService.addPart(project, role, character));
+                    return "part";
                 } else {
                     model.addAttribute("success", false);
                     model.addAttribute("response", "Creazione della parte fallita: non sei il proprietario del progetto");
@@ -173,8 +181,8 @@ public class ProjectController {
                 Candidacy c = candidacyService.getCandidacyById(candidacy);
                 Project pr = projectService.getProjectById(partService.getPartById(c.getPart()).getProject());
                 if (pr != null && pr.getOwner().equals(idToken.getPayload().getSubject())) {
-                    partService.updatePart(c.getPart(), c.getUser());
-                    return getProjectById(model, pr.getId(), idTokenString);
+                    addPartProperties(model, partService.updatePart(c.getPart(), c.getUser()));
+                    return "part";
                 } else {
                     model.addAttribute("success", false);
                     model.addAttribute("response", "Assegnazione della parte fallita: non sei il proprietario del progetto");
@@ -196,8 +204,8 @@ public class ProjectController {
         if (idToken != null) {
             try {
                 candidacyService.addCandidacy(part, idToken.getPayload().getSubject());
-                Part p = partService.getPartById(part);
-                return getProjectById(model, p.getProject(), idTokenString);
+                addPartProperties(model, partService.getPartById(part));
+                return "part";
             } catch (ConstraintViolationException e) {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Creazione della candidatura fallita");
@@ -212,6 +220,18 @@ public class ProjectController {
     @RequestMapping(value = "/projects/{title}", method = RequestMethod.GET)
     public String listProjectsByTitle(Model model, @PathVariable String title) {
         model.addAttribute("projects", projectService.listProjectsByTitle(title));
+        return "projectsList";
+    }
+    
+    @RequestMapping(value = "/projectsOwner/{owner}", method = RequestMethod.GET)
+    public String listProjectsByOwner(Model model, @PathVariable String owner) {
+        model.addAttribute("projects", projectService.listProjectsByOwner(owner));
+        return "projectsList";
+    }
+    
+    @RequestMapping(value = "/projectsCollab/{collaborator}", method = RequestMethod.GET)
+    public String listProjectsByCollaborator(Model model, @PathVariable String collaborator) {
+        model.addAttribute("projects", projectService.listProjectsByCollaborator(collaborator));
         return "projectsList";
     }
 

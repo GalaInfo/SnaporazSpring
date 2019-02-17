@@ -5,9 +5,11 @@ import java.util.List;
 
 public interface PartService {
     
-    public void addPart(int project, String role, String character);
+    public Part addPart(int project, String role, String character);
+    
+    public Part addPart(int project, String user, String role, String character);
 
-    public void updatePart(int id, String user);
+    public Part updatePart(int id, String user);
     
     public Part getPartById(int id);
 

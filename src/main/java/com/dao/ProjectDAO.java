@@ -19,6 +19,10 @@ public interface ProjectDAO {
     public List<Project> advancedProjectSearch(String title, String owner, String genre, String collab, String order, boolean asc);
 
     public List<Project> listProjectsByTitle(String title);
+    
+    public List<Project> listProjectsByOwner(String owner);
+    
+    public List<Project> listProjectsByCollaborator(String collaborator);
 
     public Project getProjectById(int id);
     

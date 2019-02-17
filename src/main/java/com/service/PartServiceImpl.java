@@ -19,7 +19,7 @@ public class PartServiceImpl implements PartService {
 
     @Override
     @Transactional
-    public void addPart(int project, String role, String character) {
+    public Part addPart(int project, String role, String character) {
         Part p = new Part();
         p.setProject(project);
         p.setRole(role);
@@ -27,16 +27,31 @@ public class PartServiceImpl implements PartService {
         p.setUser(null);
         
         partDAO.addPart(p);
+        return p;
     }
 
     @Override
     @Transactional
-    public void updatePart(int id, String user) {
+    public Part addPart(int project, String user, String role, String character) {
+        Part p = new Part();
+        p.setProject(project);
+        p.setRole(role);
+        p.setCharacter(character);
+        p.setUser(user);
+        
+        partDAO.addPart(p);
+        return p;
+    }
+
+    @Override
+    @Transactional
+    public Part updatePart(int id, String user) {
         Part p = getPartById(id);
         if(p.getUser() == null)
             p.setUser(user);
         
         partDAO.updatePart(p);
+        return p;
     }
 
     @Override

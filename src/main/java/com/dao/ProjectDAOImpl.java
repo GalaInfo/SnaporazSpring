@@ -66,6 +66,22 @@ public class ProjectDAOImpl implements ProjectDAO{
     }
 
     @Override
+    public List<Project> listProjectsByOwner(String owner) {
+        Session session = this.sessionFactory.getCurrentSession();
+        return session.createCriteria(Project.class).add(Restrictions.eq("owner", owner)).list();
+    }
+
+    @Override
+    public List<Project> listProjectsByCollaborator(String collaborator) {
+        Session session = this.sessionFactory.getCurrentSession();
+        String hql = "SELECT DISTINCT pr FROM Project pr, Part pa WHERE pr.id = pa.project AND pa.user = :collaborator";
+        
+        Query q = session.createQuery(hql);        
+        q.setString("collaborator", collaborator);
+        return q.list();
+    }
+
+    @Override
     public Project getProjectById(int id) {
         Session session = this.sessionFactory.getCurrentSession();
         return (Project) session.createCriteria(Project.class).add(Restrictions.eq("id", id)).uniqueResult();

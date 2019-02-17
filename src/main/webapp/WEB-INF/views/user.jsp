@@ -7,10 +7,10 @@
 <%@ taglib prefix="json" uri="http://www.atg.com/taglibs/json" %>
 
 <json:object name="user">
-    <json:property name="id" value="${user.id}"/>
+    <json:property name="userId" value="${user.id}"/>
     <json:property name="name" value="${user.name}"/>
     <json:property name="surname" value="${user.surname}"/>
-    <json:property name="role" value="${user.role}"/>
+    <json:property name="role" value="${user.roles}"/>
     <json:property name="image" value="${user.image}"/>
     <json:property name="birth" value="${user.birth}"/>
     <json:property name="nation" value="${user.nation}"/>

@@ -13,6 +13,10 @@ public interface ProjectService {
     
     public List<Project> listProjectsByTitle(String title);
     
+    public List<Project> listProjectsByOwner(String owner);
+    
+    public List<Project> listProjectsByCollaborator(String collaborator);
+    
     public List<Project> listMostFoundedProjects();
     
     public List<Project> listMostRecentProjects();

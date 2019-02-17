@@ -56,6 +56,18 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    public List<Project> listProjectsByOwner(String owner) {
+        return projectDAO.listProjectsByOwner(owner);
+    }
+
+    @Override
+    @Transactional
+    public List<Project> listProjectsByCollaborator(String collaborator) {
+        return projectDAO.listProjectsByCollaborator(collaborator);
+    }
+
+    @Override
+    @Transactional
     public List<Project> listMostFoundedProjects() {
         return projectDAO.listMostFoundedProjects();
     }
