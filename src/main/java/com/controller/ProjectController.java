@@ -68,6 +68,7 @@ public class ProjectController {
             model.addAttribute("user", user);
         } else {
             List<Candidacy> candidacies = candidacyService.listCandidaciesByPart(part.getId());
+            model.addAttribute("candidacies", candidacies);
             for (Candidacy c : candidacies) {
                 model.addAttribute("cand" + c.getId(), userService.getUserById(c.getUser()));
             }

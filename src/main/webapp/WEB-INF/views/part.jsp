@@ -14,8 +14,8 @@
     <json:property name="name" value="${user.name}"/>
     <json:property name="surname" value="${user.surname}"/>
     <json:property name="image" value="${user.image}"/>
-    <json:array name="candidates" var="cand" items="${candidates}">
-        <c:set var="candId" value="cand${part.user}"/>
+    <json:array name="candidacies" var="cand" items="${candidacies}">
+        <c:set var="candId" value="cand${cand.id}"/>
         <json:object>
             <json:property name="id" value="${cand.id}"/>
             <json:property name="name" value="${requestScope[candId].name}"/>
