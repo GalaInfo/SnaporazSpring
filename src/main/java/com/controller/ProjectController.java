@@ -61,12 +61,11 @@ public class ProjectController {
         this.userService = s;
     }
 
-    private void addPartProperties(Model model, Part part) {
+    private void addPartProperties(Model model, Part part, String userId) {
         model.addAttribute("part", part);
-        User user = userService.getUserById(part.getUser());
-        if (user != null) {
-            model.addAttribute("user", user);
-        } else {
+        if (!"".equals(part.getUser())) {
+            model.addAttribute("user", userService.getUserById(part.getUser()));
+        } else if (projectService.getProjectById(part.getProject()).getOwner().equals(userId)) {
             List<Candidacy> candidacies = candidacyService.listCandidaciesByPart(part.getId());
             model.addAttribute("candidacies", candidacies);
             for (Candidacy c : candidacies) {
@@ -94,14 +93,14 @@ public class ProjectController {
             boolean owner = idToken != null && idToken.getPayload().getSubject().equals(pr.getOwner());
             model.addAttribute("owner", owner);
             for (Part p : parts) {
-                if ("".equals(p.getUser()) && owner) {
-                    List<User> users = new ArrayList<>();
-                    for (Candidacy c : candidacyService.listCandidaciesByPart(p.getId())) {
-                        users.add(userService.getUserById(c.getUser()));
-                    }
-                    model.addAttribute("part" + p.getId(), users);
-                } else if (!"".equals(p.getUser())) {
+                if (!"".equals(p.getUser())) {
                     model.addAttribute("user" + p.getUser(), userService.getUserById(p.getUser()));
+                } else if (owner) {
+                    List<Candidacy> candidacies = candidacyService.listCandidaciesByPart(p.getId());
+                    model.addAttribute("part" + p.getId(), candidacies);
+                    for (Candidacy c : candidacies) {
+                        model.addAttribute("cand" + c.getId(), userService.getUserById(c.getUser()));
+                    }
                 }
             }
             model.addAttribute("days", Days.daysBetween(new DateTime(), new DateTime(pr.getDeadLine())).getDays());
@@ -163,8 +162,9 @@ public class ProjectController {
         if (idToken != null) {
             try {
                 Project pr = projectService.getProjectById(project);
-                if (pr != null && pr.getOwner().equals(idToken.getPayload().getSubject())) {
-                    addPartProperties(model, partService.addPart(project, role, character));
+                String userId = idToken.getPayload().getSubject();
+                if (pr != null && pr.getOwner().equals(userId)) {
+                    addPartProperties(model, partService.addPart(project, role, character), userId);
                     return "part";
                 } else {
                     model.addAttribute("success", false);
@@ -188,8 +188,9 @@ public class ProjectController {
             try {
                 Candidacy c = candidacyService.getCandidacyById(candidacy);
                 Project pr = projectService.getProjectById(partService.getPartById(c.getPart()).getProject());
-                if (pr != null && pr.getOwner().equals(idToken.getPayload().getSubject())) {
-                    addPartProperties(model, partService.updatePart(c.getPart(), c.getUser()));
+                String userId = idToken.getPayload().getSubject();
+                if (pr != null && pr.getOwner().equals(userId)) {
+                    addPartProperties(model, partService.updatePart(c.getPart(), c.getUser()), userId);
                     return "part";
                 } else {
                     model.addAttribute("success", false);
@@ -211,8 +212,9 @@ public class ProjectController {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken != null) {
             try {
-                candidacyService.addCandidacy(part, idToken.getPayload().getSubject());
-                addPartProperties(model, partService.getPartById(part));
+                String userId = idToken.getPayload().getSubject();
+                candidacyService.addCandidacy(part, userId);
+                addPartProperties(model, partService.getPartById(part), userId);
                 return "part";
             } catch (ConstraintViolationException e) {
                 model.addAttribute("success", false);

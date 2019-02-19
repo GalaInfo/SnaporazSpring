@@ -29,11 +29,12 @@
             <json:property name="surname" value="${requestScope[userId].surname}"/>
             <json:property name="image" value="${requestScope[userId].image}"/>
             <c:set var="partId" value="part${part.id}"/>
-            <json:array name="candidates" var="cand" items="${requestScope[partId]}">
+            <json:array name="candidacies" var="cand" items="${requestScope[partId]}">
+                <c:set var="candId" value="cand${cand.id}"/>
                 <json:object>
                     <json:property name="id" value="${cand.id}"/>
-                    <json:property name="name" value="${cand.name}"/>
-                    <json:property name="surname" value="${cand.surname}"/>
+                    <json:property name="name" value="${requestScope[candId].name}"/>
+                    <json:property name="surname" value="${requestScope[candId].surname}"/>
                 </json:object>
             </json:array>
         </json:object>
