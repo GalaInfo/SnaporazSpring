@@ -60,11 +60,18 @@ public class ProjectController {
     public void setUserService(UserService s) {
         this.userService = s;
     }
-    
-    private void addPartProperties(Model model, Part part){
+
+    private void addPartProperties(Model model, Part part) {
         model.addAttribute("part", part);
-        model.addAttribute("user", userService.getUserById(part.getUser()));
-        model.addAttribute("candidates", candidacyService.listCandidaciesByPart(part.getId()));
+        User user = userService.getUserById(part.getUser());
+        if (user != null) {
+            model.addAttribute("user", user);
+        } else {
+            List<Candidacy> candidacies = candidacyService.listCandidaciesByPart(part.getId());
+            for (Candidacy c : candidacies) {
+                model.addAttribute("cand" + c.getId(), userService.getUserById(c.getUser()));
+            }
+        }
     }
 
     @RequestMapping(value = "/")
@@ -136,7 +143,7 @@ public class ProjectController {
             try {
                 String owner = idToken.getPayload().getSubject();
                 int projectId = projectService.addProject(title, genres, plot, img, min, prizes, owner);
-                partService.addPart(projectId, owner, "Proprietario", "");                
+                partService.addPart(projectId, owner, "Proprietario", "");
                 return getProjectById(model, projectId, idTokenString);
             } catch (ConstraintViolationException e) {
                 model.addAttribute("success", false);
@@ -222,13 +229,13 @@ public class ProjectController {
         model.addAttribute("projects", projectService.listProjectsByTitle(title));
         return "projectsList";
     }
-    
+
     @RequestMapping(value = "/projectsOwner/{owner}", method = RequestMethod.GET)
     public String listProjectsByOwner(Model model, @PathVariable String owner) {
         model.addAttribute("projects", projectService.listProjectsByOwner(owner));
         return "projectsList";
     }
-    
+
     @RequestMapping(value = "/projectsCollab/{collaborator}", method = RequestMethod.GET)
     public String listProjectsByCollaborator(Model model, @PathVariable String collaborator) {
         model.addAttribute("projects", projectService.listProjectsByCollaborator(collaborator));
