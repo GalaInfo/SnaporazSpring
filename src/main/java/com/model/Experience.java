@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
 
 @Entity
 @Table(name = "ESPERIENZA")
@@ -26,9 +25,9 @@ public class Experience {
     @Column(name = "personaggio")
     private String character;
     @Column(name = "inizio")
-    private Date start;
+    private int start;
     @Column(name = "fine")
-    private Date end;
+    private int end;
     @Column(name = "utente")
     private String user;
 
@@ -52,11 +51,11 @@ public class Experience {
         return character;
     }
 
-    public Date getStart() {
+    public int getStart() {
         return start;
     }
 
-    public Date getEnd() {
+    public int getEnd() {
         return end;
     }
 
@@ -84,11 +83,11 @@ public class Experience {
         this.character = character;
     }
 
-    public void setStart(Date start) {
+    public void setStart(int start) {
         this.start = start;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(int end) {
         this.end = end;
     }
 

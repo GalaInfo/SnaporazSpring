@@ -13,6 +13,7 @@
     <json:property name="role" value="${user.roles}"/>
     <json:property name="image" value="${user.image}"/>
     <json:property name="birth" value="${user.birth}"/>
+    <json:property name="age" value="${age}"/>
     <json:property name="nation" value="${user.nation}"/>
     <json:property name="mail" value="${user.mail}"/>
     <json:array name="experiences" var="experience" items="${experiences}">

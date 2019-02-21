@@ -95,7 +95,7 @@ public class User implements Serializable {
     public void setImage(String image) {
         this.image = image;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

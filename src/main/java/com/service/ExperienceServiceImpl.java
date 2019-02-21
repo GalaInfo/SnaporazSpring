@@ -2,7 +2,6 @@ package com.service;
 
 import com.dao.ExperienceDAO;
 import com.model.Experience;
-import java.util.Date;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     @Override
     @Transactional
-    public void addExperience(String title, String genres, String role, String character, Date start, Date end, String user) {
+    public void addExperience(String title, String genres, String role, String character, int start, int end, String user) {
         Experience e = new Experience();
         
         e.setTitle(title);

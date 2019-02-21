@@ -63,7 +63,7 @@ public class ProjectController {
 
     private void addPartProperties(Model model, Part part, String userId) {
         model.addAttribute("part", part);
-        if (!"".equals(part.getUser())) {
+        if (part.getUser()!= null) {
             model.addAttribute("user", userService.getUserById(part.getUser()));
         } else if (projectService.getProjectById(part.getProject()).getOwner().equals(userId)) {
             List<Candidacy> candidacies = candidacyService.listCandidaciesByPart(part.getId());
@@ -93,7 +93,7 @@ public class ProjectController {
             boolean owner = idToken != null && idToken.getPayload().getSubject().equals(pr.getOwner());
             model.addAttribute("owner", owner);
             for (Part p : parts) {
-                if (!"".equals(p.getUser())) {
+                if (p.getUser() != null) {
                     model.addAttribute("user" + p.getUser(), userService.getUserById(p.getUser()));
                 } else if (owner) {
                     List<Candidacy> candidacies = candidacyService.listCandidaciesByPart(p.getId());

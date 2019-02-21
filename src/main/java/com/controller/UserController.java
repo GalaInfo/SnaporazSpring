@@ -3,23 +3,14 @@ package com.controller;
 import com.extra.GoogleVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.model.User;
 import com.service.ExperienceService;
 import com.service.UserService;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.hibernate.exception.ConstraintViolationException;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -70,7 +61,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/experience", method = RequestMethod.POST)
-    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam Date start, @RequestParam Date end, @RequestParam String idTokenString) {
+    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam int start, @RequestParam int end, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         try {
             String userId = idToken.getPayload().getSubject();
@@ -83,27 +74,11 @@ public class UserController {
         return "response";
     }
 
-    @RequestMapping(value = "/test/experience", method = RequestMethod.GET)
-    public String addExperience(Model model) {
-        //user da togliere e prenderlo direttamente dalla sessione
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.YEAR, -30);
-        Date start = cal.getTime();
-        cal.add(Calendar.YEAR, 1);
-        Date end = cal.getTime();
-        try {
-            experienceService.addExperience("Mean Streets", "Gangster", "Regista", null, start, end, "0");
-            return getUserById(model, "0");
-        } catch (ConstraintViolationException e) {
-            model.addAttribute("success", false);
-            model.addAttribute("response", "Aggiunta dell' esperienza fallita");
-        }
-        return "response";
-    }
-
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public String getUserById(Model model, @PathVariable String id) {
-        model.addAttribute("user", userService.getUserById(id));
+        User user = userService.getUserById(id);
+        model.addAttribute("user", user);
+        model.addAttribute("age", new Period(new DateTime(user.getBirth()), new DateTime()).getYears());
         model.addAttribute("experiences", experienceService.listExperiencesByUser(id));
         return "user";
     }
