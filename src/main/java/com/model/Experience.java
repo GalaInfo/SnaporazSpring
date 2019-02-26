@@ -22,8 +22,6 @@ public class Experience {
     private String genres;
     @Column(name = "ruolo")
     private String role;
-    @Column(name = "personaggio")
-    private String character;
     @Column(name = "inizio")
     private int start;
     @Column(name = "fine")
@@ -45,10 +43,6 @@ public class Experience {
 
     public String getRole() {
         return role;
-    }
-
-    public String getCharacter() {
-        return character;
     }
 
     public int getStart() {
@@ -79,10 +73,6 @@ public class Experience {
         this.role = role;
     }
 
-    public void setCharacter(String character) {
-        this.character = character;
-    }
-
     public void setStart(int start) {
         this.start = start;
     }
@@ -97,7 +87,7 @@ public class Experience {
 
     @Override
     public String toString() {
-        return "Experience{" + "id=" + id + ", title=" + title + ", genres=" + genres + ", role=" + role + ", character=" + character + ", start=" + start + ", end=" + end + ", user=" + user + '}';
+        return "Experience{" + "id=" + id + ", title=" + title + ", genres=" + genres + ", role=" + role + ", start=" + start + ", end=" + end + ", user=" + user + '}';
     }
 
     @Override

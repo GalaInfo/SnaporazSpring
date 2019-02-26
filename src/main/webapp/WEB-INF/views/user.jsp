@@ -23,7 +23,6 @@
             <json:property name="title" value="${experience.title}"/>
             <json:property name="genres" value="${experience.genres}"/>
             <json:property name="role" value="${experience.role}"/>
-            <json:property name="character" value="${experience.character}"/>
         </json:object>
     </json:array>
 </json:object>

@@ -61,11 +61,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "/experience", method = RequestMethod.POST)
-    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam String character, @RequestParam int start, @RequestParam int end, @RequestParam String idTokenString) {
+    public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam int start, @RequestParam int end, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         try {
             String userId = idToken.getPayload().getSubject();
-            experienceService.addExperience(title, genres, role, character, start, end, userId);
+            experienceService.addExperience(title, genres, role, start, end, userId);
             return getUserById(model, userId);
         } catch (ConstraintViolationException e) {
             model.addAttribute("success", false);

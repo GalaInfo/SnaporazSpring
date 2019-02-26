@@ -187,6 +187,11 @@ public class ProjectController {
         if (idToken != null) {
             try {
                 Candidacy c = candidacyService.getCandidacyById(candidacy);
+                if(c == null){
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Assegnazione della parte fallita: candidatura inesistente");
+                    return "response";
+                }
                 Project pr = projectService.getProjectById(partService.getPartById(c.getPart()).getProject());
                 String userId = idToken.getPayload().getSubject();
                 if (pr != null && pr.getOwner().equals(userId)) {
