@@ -29,8 +29,9 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void updateUser(User p) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void updateUser(User u) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(u);
     }
 
     @SuppressWarnings("unchecked")

@@ -2,6 +2,7 @@ package com.service;
 
 import com.dao.UserDAO;
 import com.model.User;
+import java.util.Date;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,25 @@ public class UserServiceImpl implements UserService {
         u.setName(name);
         u.setSurname(surname);
         userDAO.addUser(u);
+        return u;
+    }
+
+    @Override
+    @Transactional
+    public User updateUser(String id, String name, String surname, String roles, String mail, Date birth, String nation, String image) {
+        User u = userDAO.getUserById(id);
+        if(u == null)
+            return null;
+        
+        u.setName(name);
+        u.setSurname(surname);
+        u.setRoles(roles);
+        u.setMail(mail);
+        u.setBirth(birth);
+        u.setNation(nation);
+        u.setImage(image);
+        
+        userDAO.updateUser(u);
         return u;
     }
 

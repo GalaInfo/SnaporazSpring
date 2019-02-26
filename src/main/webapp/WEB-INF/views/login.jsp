@@ -7,7 +7,6 @@
 <%@ taglib prefix="json" uri="http://www.atg.com/taglibs/json" %>
 
     <json:object>
-        <json:property name="UserMail" value="${user.mail}"/>
         <json:property name="UserName" value="${user.name}"/>
         <json:property name="UserSurname" value="${user.surname}"/>
         <json:property name="UserId" value="${user.id}"/>

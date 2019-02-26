@@ -49,7 +49,7 @@ public class UserController {
             }
             model.addAttribute("user", u);
         }
-        return "prova";
+        return "login";
     }
 
     private User register(String id, String mail, String name, String surname) {
@@ -58,6 +58,25 @@ public class UserController {
         } catch (ConstraintViolationException e) {
             return null;
         }
+    }
+
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    private String updateUser(Model model, @RequestParam String idTokenString, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam String mail, @RequestParam Date birth, @RequestParam String nation, @RequestParam String image) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if (idToken != null) {
+            User u = userService.updateUser(idToken.getPayload().getSubject(), name, surname, roles, mail, birth, nation, image);
+            if (u == null) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Aggiornamento utente fallito: utente inesistente");
+                return "response";
+            }
+            model.addAttribute("user", u);
+            return "user";
+        }
+        model.addAttribute("success", false);
+        model.addAttribute("response", "Aggiornamento utente fallito: login non effettuato");
+        return "response";
+
     }
 
     @RequestMapping(value = "/experience", method = RequestMethod.POST)
