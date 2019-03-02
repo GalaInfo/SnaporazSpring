@@ -84,8 +84,8 @@ public class UserController {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         try {
             String userId = idToken.getPayload().getSubject();
-            experienceService.addExperience(title, genres, role, start, end, userId);
-            return getUserById(model, userId);
+            model.addAttribute("experience", experienceService.addExperience(title, genres, role, start, end, userId));
+            return "experience";
         } catch (ConstraintViolationException e) {
             model.addAttribute("success", false);
             model.addAttribute("response", "Aggiunta dell' esperienza fallita");
