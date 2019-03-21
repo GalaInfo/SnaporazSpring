@@ -74,7 +74,7 @@ public class ProjectController {
         }
     }
 
-    @RequestMapping(value = "/")
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public String mainPage(Model model) {
         model.addAttribute("mostFoundedProjects", projectService.listMostFoundedProjects());
         model.addAttribute("mostRecentProjects", projectService.listMostRecentProjects());

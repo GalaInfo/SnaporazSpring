@@ -61,7 +61,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    private String updateUser(Model model, @RequestParam String idTokenString, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam String mail, @RequestParam Date birth, @RequestParam String nation, @RequestParam String image) {
+    public String updateUser(Model model, @RequestParam String idTokenString, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam String mail, @RequestParam Date birth, @RequestParam String nation, @RequestParam String image) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken != null) {
             User u = userService.updateUser(idToken.getPayload().getSubject(), name, surname, roles, mail, birth, nation, image);
