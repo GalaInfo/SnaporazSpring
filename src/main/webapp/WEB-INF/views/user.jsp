@@ -19,7 +19,8 @@
     <json:array name="experiences" var="experience" items="${experiences}">
         <json:object>
             <json:property name="id" value="${experience.id}"/>
-            <json:property name="date" value="${experience.start}"/>
+            <json:property name="start" value="${experience.start}"/>
+            <json:property name="end" value="${experience.end}"/>
             <json:property name="title" value="${experience.title}"/>
             <json:property name="genres" value="${experience.genres}"/>
             <json:property name="role" value="${experience.role}"/>

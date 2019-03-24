@@ -6,7 +6,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.model.User;
 import com.service.ExperienceService;
 import com.service.UserService;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
@@ -61,10 +61,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public String updateUser(Model model, @RequestParam String idTokenString, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam String mail, @RequestParam Date birth, @RequestParam String nation, @RequestParam String image) {
+    public String updateUser(Model model, @RequestParam String idTokenString, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam String mail, @RequestParam long birth, @RequestParam String nation, @RequestParam String image) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken != null) {
-            User u = userService.updateUser(idToken.getPayload().getSubject(), name, surname, roles, mail, birth, nation, image);
+            User u = userService.updateUser(idToken.getPayload().getSubject(), name, surname, roles, mail, new Date(birth), nation, image);
             if (u == null) {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Aggiornamento utente fallito: utente inesistente");
