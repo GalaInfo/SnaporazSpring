@@ -203,6 +203,7 @@ public class ProjectController {
                     } else {
                         donationService.addDonation(transactionId, project, owner, sum);
                         model.addAttribute("project", p);
+                        model.addAttribute("days", Days.daysBetween(new DateTime(), new DateTime(p.getDeadLine())).getDays());
                         return "donation";
                     }
                 } else {
