@@ -19,7 +19,7 @@ public class GoogleVerifier {
     
     public static GoogleIdToken verify(String idTokenString){
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Collections.singletonList("617542772314-keo0t31kssvhk31g3ghjhho21m8s53cm.apps.googleusercontent.com")).build();
-        GoogleIdToken idToken= null;
+        GoogleIdToken idToken = null;
         try {
             idToken = verifier.verify(idTokenString);
         } catch (Exception ex) {}

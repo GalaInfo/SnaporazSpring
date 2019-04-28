@@ -36,6 +36,12 @@ public class ProjectDAOImpl implements ProjectDAO{
     }
 
     @Override
+    public void updateProject(Project p) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(p);
+    }
+    
+    @Override
     public List<Project> advancedProjectSearch(String title, String owner, String genre, String collab, String order, boolean asc) {
         Session session = this.sessionFactory.getCurrentSession();
         String hql = "SELECT DISTINCT pr FROM Project pr, User o";

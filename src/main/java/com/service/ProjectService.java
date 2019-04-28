@@ -6,6 +6,8 @@ import java.util.List;
 public interface ProjectService {
     
     public int addProject(String title, String genres, String plot, String img, double min, String prizes, String owner);
+    
+    public Project updateProject(int id, double sum);
 
     public Project getProjectById(int id);
     

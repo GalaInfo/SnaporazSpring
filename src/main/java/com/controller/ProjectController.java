@@ -5,7 +5,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.model.Candidacy;
 import com.model.Part;
 import com.model.Project;
-import com.model.User;
 import com.service.CandidacyService;
 import com.service.PartService;
 import com.service.ProjectService;
@@ -13,18 +12,24 @@ import com.service.UserService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 @Controller
 public class ProjectController {
@@ -61,9 +66,36 @@ public class ProjectController {
         this.userService = s;
     }
 
+    /*
+    403 Forbidden
+    
+    @RequestMapping(value = "/pay", method = RequestMethod.GET)
+    public void pay(Model model) {
+        final String uri = "https://api.sandbox.paypal.com/v2/checkout/orders/4HG34491JH664093N";
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        headers.set("Authorization", "Bearer A21AAGgcovPkTBIeeqKZ-b16YF5w2W4QOAYRDe6gmSGtMA2xUXV88bY3EysRkcXpLce4LYC9UTc-QlzuFxmj4Ipy6cDeNWBvw");
+        headers.set("User-Agent", "Snaporaz");
+
+        //Create a new HttpEntity
+        HttpEntity entity = new HttpEntity(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        
+        //Execute the method writing your HttpEntity to the request
+        try{
+        ResponseEntity<Map> response = restTemplate.exchange(uri, HttpMethod.GET, entity, Map.class);
+        System.out.println(response.getBody());
+        }catch(HttpClientErrorException e){
+            System.out.println(e.getMessage());
+        }
+        
+    }
+*/
     private void addPartProperties(Model model, Part part, String userId) {
         model.addAttribute("part", part);
-        if (part.getUser()!= null) {
+        if (part.getUser() != null) {
             model.addAttribute("user", userService.getUserById(part.getUser()));
         } else if (projectService.getProjectById(part.getProject()).getOwner().equals(userId)) {
             List<Candidacy> candidacies = candidacyService.listCandidaciesByPart(part.getId());
@@ -155,6 +187,30 @@ public class ProjectController {
         }
         return "response";
     }
+    
+    @RequestMapping(value = "/donate", method = RequestMethod.POST)
+    public String donate(Model model, @RequestParam String transactionId, @RequestParam int project, @RequestParam double sum, @RequestParam String idTokenString) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if (idToken != null) {
+            try {
+                String owner = idToken.getPayload().getSubject();
+                Project p = projectService.updateProject(project, sum);
+                if(p == null){
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Donazione fallita: progetto inesistente");
+                }
+                model.addAttribute("project", p);
+                return "donation";
+            } catch (ConstraintViolationException e) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Donazione fallita");
+            }
+        } else {
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Donazione fallita: login non effettuato");
+        }
+        return "response";
+    }
 
     @RequestMapping(value = "/part", method = RequestMethod.POST)
     public String addPart(Model model, @RequestParam int project, @RequestParam String role, @RequestParam String character, @RequestParam String idTokenString) {
@@ -187,7 +243,7 @@ public class ProjectController {
         if (idToken != null) {
             try {
                 Candidacy c = candidacyService.getCandidacyById(candidacy);
-                if(c == null){
+                if (c == null) {
                     model.addAttribute("success", false);
                     model.addAttribute("response", "Assegnazione della parte fallita: candidatura inesistente");
                     return "response";

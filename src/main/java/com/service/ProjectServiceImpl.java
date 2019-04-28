@@ -35,6 +35,19 @@ public class ProjectServiceImpl implements ProjectService {
         p.setDeadLine(cal.getTime());
         return projectDAO.addProject(p);
     }
+    
+    @Override
+    @Transactional
+    public Project updateProject(int id, double sum) {
+        Project p = projectDAO.getProjectById(id);
+        if(p == null)
+            return null;
+        
+        p.donate(sum);
+        
+        projectDAO.updateProject(p);
+        return p;
+    }
 
     @Override
     @Transactional

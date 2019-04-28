@@ -78,8 +78,8 @@ public class Project {
         return prizes;
     }
     
-    public String getDonations() {
-        return prizes;
+    public int getDonations() {
+        return donations;
     }
     
     public void setId(int id) {
