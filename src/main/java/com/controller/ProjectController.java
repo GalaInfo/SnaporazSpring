@@ -200,6 +200,7 @@ public class ProjectController {
                     model.addAttribute("response", "Donazione fallita: progetto inesistente");
                 }
                 model.addAttribute("project", p);
+                
                 return "donation";
             } catch (ConstraintViolationException e) {
                 model.addAttribute("success", false);
