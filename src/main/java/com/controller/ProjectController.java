@@ -13,6 +13,7 @@ import com.service.UserService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.ws.rs.FormParam;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -190,21 +191,29 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/donate", method = RequestMethod.POST)
-    public String donate(Model model, @RequestParam String transactionId, @RequestParam int project, @RequestParam double sum, @RequestParam String idTokenString) {
+    public String donate(Model model, @FormParam("transactionId") String transactionId, @FormParam("project") int project, @FormParam("sum") double sum, @FormParam("idTokenString") String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken != null) {
             try {
                 String owner = idToken.getPayload().getSubject();
+                
+                //controllo da eliminare
                 if (donationService.getDonationById(transactionId) == null) {
                     Project p = projectService.updateProject(project, sum);
                     if (p == null) {
                         model.addAttribute("success", false);
                         model.addAttribute("response", "Donazione fallita: progetto inesistente");
                     } else {
+                        /*
                         donationService.addDonation(transactionId, project, owner, sum);
                         model.addAttribute("project", p);
                         model.addAttribute("days", Days.daysBetween(new DateTime(), new DateTime(p.getDeadLine())).getDays());
-                        return "donation";
+                        */
+                        
+                        model.addAttribute("success", true);
+                        model.addAttribute("response", "Donazione effettuata con successo");
+                        
+                        return "response";
                     }
                 } else {
                     model.addAttribute("success", false);
