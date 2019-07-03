@@ -195,7 +195,7 @@ public class ProjectController {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken != null) {
             try {
-                String owner = idToken.getPayload().getSubject();
+                String donor = idToken.getPayload().getSubject();
                 
                 //controllo da eliminare
                 if (donationService.getDonationById(transactionId) == null) {
@@ -212,8 +212,9 @@ public class ProjectController {
                         
                         model.addAttribute("success", true);
                         model.addAttribute("response", "Donazione effettuata con successo");
+                        model.addAttribute("userId", donor);
                         
-                        return "response";
+                        return "donation";
                     }
                 } else {
                     model.addAttribute("success", false);
