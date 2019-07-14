@@ -7,9 +7,8 @@
 <%@ taglib prefix="json" uri="http://www.atg.com/taglibs/json" %>
 
 <json:object name="donation">
-    <json:property name="success" value="${success}"/>
-    <json:property name="response" value="${response}"/>
-    <json:property name="userId" value="${userId}"/>
+    <json:property name="actual" value="${project.actual}"/>
+    <json:property name="donations" value="${project.actual}"/>
 </json:object>
 
 

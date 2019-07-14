@@ -190,47 +190,6 @@ public class ProjectController {
         return "response";
     }
 
-    @RequestMapping(value = "/donate", method = RequestMethod.POST)
-    public String donate(Model model, @FormParam("transactionId") String transactionId, @FormParam("project") int project, @FormParam("sum") double sum, @FormParam("idTokenString") String idTokenString) {
-        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
-        if (idToken != null) {
-            try {
-                String donor = idToken.getPayload().getSubject();
-                
-                //controllo da eliminare
-                if (donationService.getDonationById(transactionId) == null) {
-                    Project p = projectService.updateProject(project, sum);
-                    if (p == null) {
-                        model.addAttribute("success", false);
-                        model.addAttribute("response", "Donazione fallita: progetto inesistente");
-                    } else {
-                        /*
-                        donationService.addDonation(transactionId, project, owner, sum);
-                        model.addAttribute("project", p);
-                        model.addAttribute("days", Days.daysBetween(new DateTime(), new DateTime(p.getDeadLine())).getDays());
-                        */
-                        
-                        model.addAttribute("success", true);
-                        model.addAttribute("response", "Donazione effettuata con successo");
-                        model.addAttribute("userId", donor);
-                        
-                        return "donation";
-                    }
-                } else {
-                    model.addAttribute("success", false);
-                    model.addAttribute("response", "Donazione già effettuata");
-                }
-            } catch (ConstraintViolationException e) {
-                model.addAttribute("success", false);
-                model.addAttribute("response", "Donazione fallita");
-            }
-        } else {
-            model.addAttribute("success", false);
-            model.addAttribute("response", "Donazione fallita: login non effettuato");
-        }
-        return "response";
-    }
-
     @RequestMapping(value = "/part", method = RequestMethod.POST)
     public String addPart(Model model, @RequestParam int project, @RequestParam String role, @RequestParam String character, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -335,5 +294,45 @@ public class ProjectController {
     public String advancedProjectSearch(Model model) {
         model.addAttribute("projects", projectService.advancedProjectSearch(null, null, null, "Scorsese", null, true));
         return "projectsList";
+    }
+
+    @RequestMapping(value = "/donate", method = RequestMethod.POST)
+    public String donate(Model model, @RequestParam String payment, @RequestParam String idTokenString, @RequestParam int project, @RequestParam double amount) {
+        GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
+        if(idToken == null){
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Donazione non effettuata: login non effettuato");
+        }
+        String userId = idToken.getPayload().getSubject();
+        try { // Call Web Service Operation
+            if (userService.getUserById(userId) == null) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Donazione non effettuata: utente inesistente");
+            }
+            if (projectService.getProjectById(project) == null) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Donazione non effettuata: progetto inesistente");
+            }
+            if (amount <= 0) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Donazione non effettuata: l'importo deve essere superiore a 0");
+            }
+            ejb.PaymentService_Service service = new ejb.PaymentService_Service();
+            ejb.PaymentService port = service.getPaymentServicePort();
+            // TODO initialize WS operation arguments here
+
+            // TODO process result here
+            String result = port.addPayment(payment, userId, project, amount);
+            if ("Donazione avvenuta con successo".equals(result)) {
+                model.addAttribute("project", projectService.updateProject(project, amount));
+                return "donation";
+            }else{
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Donazione già effettuata");
+            }
+        } catch (Exception ex) {
+            // TODO handle custom exceptions here
+        }
+        return "response";
     }
 }
