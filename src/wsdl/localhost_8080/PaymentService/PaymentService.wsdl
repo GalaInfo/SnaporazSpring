@@ -4,11 +4,11 @@
 <xsd:import namespace="http://ejb/" schemaLocation="http://localhost:8080/PaymentService/PaymentService?xsd=1"/>
 </xsd:schema>
 </types>
-<message name="addPayment">
-<part name="parameters" element="tns:addPayment"/>
+<message name="clearPayments">
+<part name="parameters" element="tns:clearPayments"/>
 </message>
-<message name="addPaymentResponse">
-<part name="parameters" element="tns:addPaymentResponse"/>
+<message name="clearPaymentsResponse">
+<part name="parameters" element="tns:clearPaymentsResponse"/>
 </message>
 <message name="getPayments">
 <part name="parameters" element="tns:getPayments"/>
@@ -16,29 +16,29 @@
 <message name="getPaymentsResponse">
 <part name="parameters" element="tns:getPaymentsResponse"/>
 </message>
-<message name="clearPayments">
-<part name="parameters" element="tns:clearPayments"/>
+<message name="addPayment">
+<part name="parameters" element="tns:addPayment"/>
 </message>
-<message name="clearPaymentsResponse">
-<part name="parameters" element="tns:clearPaymentsResponse"/>
+<message name="addPaymentResponse">
+<part name="parameters" element="tns:addPaymentResponse"/>
 </message>
 <portType name="PaymentService">
-<operation name="addPayment">
-<input wsam:Action="http://ejb/PaymentService/addPaymentRequest" message="tns:addPayment"/>
-<output wsam:Action="http://ejb/PaymentService/addPaymentResponse" message="tns:addPaymentResponse"/>
+<operation name="clearPayments">
+<input wsam:Action="http://ejb/PaymentService/clearPaymentsRequest" message="tns:clearPayments"/>
+<output wsam:Action="http://ejb/PaymentService/clearPaymentsResponse" message="tns:clearPaymentsResponse"/>
 </operation>
 <operation name="getPayments">
 <input wsam:Action="http://ejb/PaymentService/getPaymentsRequest" message="tns:getPayments"/>
 <output wsam:Action="http://ejb/PaymentService/getPaymentsResponse" message="tns:getPaymentsResponse"/>
 </operation>
-<operation name="clearPayments">
-<input wsam:Action="http://ejb/PaymentService/clearPaymentsRequest" message="tns:clearPayments"/>
-<output wsam:Action="http://ejb/PaymentService/clearPaymentsResponse" message="tns:clearPaymentsResponse"/>
+<operation name="addPayment">
+<input wsam:Action="http://ejb/PaymentService/addPaymentRequest" message="tns:addPayment"/>
+<output wsam:Action="http://ejb/PaymentService/addPaymentResponse" message="tns:addPaymentResponse"/>
 </operation>
 </portType>
 <binding name="PaymentServicePortBinding" type="tns:PaymentService">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-<operation name="addPayment">
+<operation name="clearPayments">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -56,7 +56,7 @@
 <soap:body use="literal"/>
 </output>
 </operation>
-<operation name="clearPayments">
+<operation name="addPayment">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>

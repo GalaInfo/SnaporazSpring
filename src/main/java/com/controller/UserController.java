@@ -6,7 +6,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.model.User;
 import com.service.ExperienceService;
 import com.service.UserService;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
@@ -84,11 +83,16 @@ public class UserController {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         try {
             String userId = idToken.getPayload().getSubject();
-            model.addAttribute("experience", experienceService.addExperience(title, genres, role, start, end, userId));
-            return "experience";
+            if (userService.getUserById(userId) == null) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Aggiunta dell'esperienza fallita: utente inesistente");
+            } else {
+                model.addAttribute("experience", experienceService.addExperience(title, genres, role, start, end, userId));
+                return "experience";
+            }
         } catch (ConstraintViolationException e) {
             model.addAttribute("success", false);
-            model.addAttribute("response", "Aggiunta dell' esperienza fallita");
+            model.addAttribute("response", "Aggiunta dell'esperienza fallita");
         }
         return "response";
     }
@@ -96,6 +100,11 @@ public class UserController {
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public String getUserById(Model model, @PathVariable String id) {
         User user = userService.getUserById(id);
+        if(user == null){
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Utente inesistente");
+            return "response";
+        }
         model.addAttribute("user", user);
         model.addAttribute("age", new Period(new DateTime(user.getBirth()), new DateTime()).getYears());
         model.addAttribute("experiences", experienceService.listExperiencesByUser(id));
@@ -105,12 +114,6 @@ public class UserController {
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public String advancedUserSearch(Model model, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam int minAge, @RequestParam int maxAge, @RequestParam String project, @RequestParam String genres, @RequestParam String order, @RequestParam boolean asc) {
         model.addAttribute("users", userService.advancedUserSearch(name, surname, roles, minAge, maxAge, project, genres, order, asc));
-        return "userList";
-    }
-
-    @RequestMapping(value = "/test/users", method = RequestMethod.GET)
-    public String testAdvancedUserSearch(Model model) {
-        model.addAttribute("users", userService.advancedUserSearch("Martin", "Scorsese", null, 0, 100, null, null, null, false));
         return "userList";
     }
 }

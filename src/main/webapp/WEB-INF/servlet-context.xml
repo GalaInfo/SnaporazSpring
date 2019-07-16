@@ -35,7 +35,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <beans:value>com.model.Experience</beans:value>
                 <beans:value>com.model.Part</beans:value>
                 <beans:value>com.model.Candidacy</beans:value>
-                <beans:value>com.model.Donation</beans:value>
             </beans:list>
         </beans:property>
         <beans:property name="hibernateProperties">
@@ -75,12 +74,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </beans:bean>
     <beans:bean id="candidacyService" class="com.service.CandidacyServiceImpl">
         <beans:property name="candidacyDAO" ref="candidacyDAO"></beans:property>
-    </beans:bean>
-    <beans:bean id="donationDAO" class="com.dao.DonationDAOImpl">
-        <beans:property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
-    </beans:bean>
-    <beans:bean id="donationService" class="com.service.DonationServiceImpl">
-        <beans:property name="donationDAO" ref="donationDAO"></beans:property>
     </beans:bean>
     <context:component-scan base-package="com" />
     <tx:annotation-driven transaction-manager="transactionManager"/>

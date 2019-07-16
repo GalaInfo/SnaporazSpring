@@ -6,14 +6,12 @@ import com.model.Candidacy;
 import com.model.Part;
 import com.model.Project;
 import com.service.CandidacyService;
-import com.service.DonationService;
 import com.service.PartService;
 import com.service.ProjectService;
 import com.service.UserService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.ws.rs.FormParam;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -33,7 +31,7 @@ public class ProjectController {
     private PartService partService;
     private CandidacyService candidacyService;
     private UserService userService;
-    private DonationService donationService;
+    private final String key = "SnaporazKey";
     private final String[] genres = {"Animazione", "Avventura", "Biografico", "Commedia", "Documentario", "Drammatico", "Erotico", "Fantascienza", "Fantasy/Fantastico", "Guerra", "Horror", "Musical", "Storico", "Thriller", "Western"};
     private final String[] cast = {"Attore Protagonista", "Attrice Protagonista", "Attore non Protagonista", "Attrice non Protagonista", "Comparsa", "Doppiatore"};
     private final String[] troupe = {"Regista", "Aiuto Regista", "Assistente alla Regia", "Sceneggiatore", "Segretario di Edizione", "Direttore della Fotografia", "Operatore alla Macchina", "Assistente Operatore", "Capo Elettricista", "Elettricista", "Capo Macchinista", "Macchinista", "Costumista", "Capo Truccatore", "Truccatore", "Scenografo", "Fonico", "Microfonista", "Compositore", "Direttore del Montaggio", "Addetto al Montaggio"};
@@ -60,12 +58,6 @@ public class ProjectController {
     @Qualifier(value = "userService")
     public void setUserService(UserService s) {
         this.userService = s;
-    }
-
-    @Autowired(required = true)
-    @Qualifier(value = "donationService")
-    public void setDonationService(DonationService s) {
-        this.donationService = s;
     }
 
     /*
@@ -176,9 +168,14 @@ public class ProjectController {
         if (idToken != null) {
             try {
                 String owner = idToken.getPayload().getSubject();
-                int projectId = projectService.addProject(title, genres, plot, img, min, prizes, owner);
-                partService.addPart(projectId, owner, "Proprietario", "");
-                return getProjectById(model, projectId, idTokenString);
+                if (userService.getUserById(owner) == null) {
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Creazione del progetto fallita: utente inesistente");
+                } else {
+                    int projectId = projectService.addProject(title, genres, plot, img, min, prizes, owner);
+                    partService.addPart(projectId, owner, "Proprietario", "");
+                    return getProjectById(model, projectId, idTokenString);
+                }
             } catch (ConstraintViolationException e) {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Creazione del progetto fallita");
@@ -197,7 +194,13 @@ public class ProjectController {
             try {
                 Project pr = projectService.getProjectById(project);
                 String userId = idToken.getPayload().getSubject();
-                if (pr != null && pr.getOwner().equals(userId)) {
+                if (userService.getUserById(userId) == null) {
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Creazione della parte fallita: utente inesistente");
+                } else if (pr == null) {
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Creazione della parte fallita: progetto inesistente");
+                } else if (pr.getOwner().equals(userId)) {
                     addPartProperties(model, partService.addPart(project, role, character), userId);
                     return "part";
                 } else {
@@ -252,9 +255,14 @@ public class ProjectController {
         if (idToken != null) {
             try {
                 String userId = idToken.getPayload().getSubject();
-                candidacyService.addCandidacy(part, userId);
-                addPartProperties(model, partService.getPartById(part), userId);
-                return "part";
+                if (userService.getUserById(userId) == null) {
+                    model.addAttribute("success", false);
+                    model.addAttribute("response", "Creazione della candidatura fallita: utente inesistente");
+                } else {
+                    candidacyService.addCandidacy(part, userId);
+                    addPartProperties(model, partService.getPartById(part), userId);
+                    return "part";
+                }
             } catch (ConstraintViolationException e) {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Creazione della candidatura fallita");
@@ -290,16 +298,10 @@ public class ProjectController {
         return "projectsList";
     }
 
-    @RequestMapping(value = "/test/projects", method = RequestMethod.GET)
-    public String advancedProjectSearch(Model model) {
-        model.addAttribute("projects", projectService.advancedProjectSearch(null, null, null, "Scorsese", null, true));
-        return "projectsList";
-    }
-
     @RequestMapping(value = "/donate", method = RequestMethod.POST)
     public String donate(Model model, @RequestParam String payment, @RequestParam String idTokenString, @RequestParam int project, @RequestParam double amount) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
-        if(idToken == null){
+        if (idToken == null) {
             model.addAttribute("success", false);
             model.addAttribute("response", "Donazione non effettuata: login non effettuato");
         }
@@ -322,16 +324,19 @@ public class ProjectController {
             // TODO initialize WS operation arguments here
 
             // TODO process result here
-            String result = port.addPayment(payment, userId, project, amount);
+            String result = port.addPayment(key, payment, userId, project, amount);
             if ("Donazione avvenuta con successo".equals(result)) {
-                model.addAttribute("project", projectService.updateProject(project, amount));
+                Project p = projectService.updateProject(project, amount);
+                model.addAttribute("project", p);
+                model.addAttribute("days", Days.daysBetween(new DateTime(), new DateTime(p.getDeadLine())).getDays());
                 return "donation";
-            }else{
+            } else {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Donazione già effettuata");
             }
         } catch (Exception ex) {
-            // TODO handle custom exceptions here
+            model.addAttribute("success", false);
+            model.addAttribute("response", "Donazione non effettuata: errore interno");
         }
         return "response";
     }

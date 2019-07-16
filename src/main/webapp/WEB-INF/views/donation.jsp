@@ -8,7 +8,9 @@
 
 <json:object name="donation">
     <json:property name="actual" value="${project.actual}"/>
-    <json:property name="donations" value="${project.actual}"/>
+    <json:property name="min" value="${project.min}"/>
+    <json:property name="donations" value="${project.donations}"/>
+    <json:property name="days" value="${days}"/>
 </json:object>
 
 

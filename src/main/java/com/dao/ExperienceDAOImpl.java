@@ -9,6 +9,7 @@ import com.model.Experience;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -32,6 +33,6 @@ public class ExperienceDAOImpl implements ExperienceDAO {
     @Override
     public List<Experience> listExperiencesByUser(String id) {
         Session session = this.sessionFactory.getCurrentSession();
-        return session.createCriteria(Experience.class).add(Restrictions.eq("user", id)).list();
+        return session.createCriteria(Experience.class).add(Restrictions.eq("user", id)).addOrder(Order.desc("start")).addOrder(Order.desc("end")).list();
     }
 }
