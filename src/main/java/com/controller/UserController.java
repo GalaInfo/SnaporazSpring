@@ -47,8 +47,11 @@ public class UserController {
                 u = register(payload.getSubject(), payload.get("email").toString(), payload.get("given_name").toString(), payload.get("family_name").toString());
             }
             model.addAttribute("user", u);
+            return "login";
         }
-        return "login";
+        model.addAttribute("success", false);
+        model.addAttribute("response", "Login non effettuato");
+        return "response";
     }
 
     private User register(String id, String mail, String name, String surname) {
@@ -100,7 +103,7 @@ public class UserController {
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public String getUserById(Model model, @PathVariable String id) {
         User user = userService.getUserById(id);
-        if(user == null){
+        if (user == null) {
             model.addAttribute("success", false);
             model.addAttribute("response", "Utente inesistente");
             return "response";
