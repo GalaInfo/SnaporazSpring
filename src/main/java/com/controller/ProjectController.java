@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.extra.GoogleVerifier;
+import com.extra.PayPalClient;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.model.Candidacy;
 import com.model.Part;
@@ -15,6 +16,7 @@ import java.util.List;
 import org.hibernate.exception.ConstraintViolationException;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -60,33 +62,6 @@ public class ProjectController {
         this.userService = s;
     }
 
-    /*
-     403 Forbidden
-    
-     @RequestMapping(value = "/pay", method = RequestMethod.GET)
-     public void pay(Model model) {
-     final String uri = "https://api.sandbox.paypal.com/v2/checkout/orders/4HG34491JH664093N";
-
-     final HttpHeaders headers = new HttpHeaders();
-     headers.set("Content-Type", "application/json");
-     headers.set("Authorization", "Bearer A21AAGgcovPkTBIeeqKZ-b16YF5w2W4QOAYRDe6gmSGtMA2xUXV88bY3EysRkcXpLce4LYC9UTc-QlzuFxmj4Ipy6cDeNWBvw");
-     headers.set("User-Agent", "Snaporaz");
-
-     //Create a new HttpEntity
-     HttpEntity entity = new HttpEntity(headers);
-
-     RestTemplate restTemplate = new RestTemplate();
-        
-     //Execute the method writing your HttpEntity to the request
-     try{
-     ResponseEntity<Map> response = restTemplate.exchange(uri, HttpMethod.GET, entity, Map.class);
-     System.out.println(response.getBody());
-     }catch(HttpClientErrorException e){
-     System.out.println(e.getMessage());
-     }
-        
-     }
-     */
     private void addPartProperties(Model model, Part part, String userId) {
         model.addAttribute("part", part);
         if (part.getUser() != null) {
@@ -100,6 +75,14 @@ public class ProjectController {
         }
     }
 
+    /**
+     * Returns three lists for the main page: the most funded, most recent
+     * projects and the ones closest to their objectives
+     *
+     * @param model
+     * @return "home" (most funded projects, most recent projects, projects
+     * closest to their objectives)
+     */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String mainPage(Model model) {
         model.addAttribute("mostFoundedProjects", projectService.listMostFoundedProjects());
@@ -108,6 +91,17 @@ public class ProjectController {
         return "home";
     }
 
+    /**
+     * Returns informations of the project with the given id and check if the
+     * current user is its owner
+     *
+     * @param model
+     * @param id
+     * @param idTokenString
+     * @return "project" (project informations, parts, candidacies and if
+     * current user owns it) in case of success, "response" (error message)
+     * otherwise
+     */
     @RequestMapping(value = "/project", method = RequestMethod.POST)
     public String getProjectById(Model model, @RequestParam int id, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -135,24 +129,48 @@ public class ProjectController {
         return "project";
     }
 
+    /**
+     * Returns a list of all the accepted movie genres
+     *
+     * @param model
+     * @return "list" (genres)
+     */
     @RequestMapping(value = "/genres", method = RequestMethod.GET)
     public String getGenres(Model model) {
         model.addAttribute("list", genres);
         return "list";
     }
 
+    /**
+     * Returns a list of all the accepted troupe roles
+     *
+     * @param model
+     * @return "list" (troupe roles)
+     */
     @RequestMapping(value = "/troupe", method = RequestMethod.GET)
     public String getTroupe(Model model) {
         model.addAttribute("list", troupe);
         return "list";
     }
 
+    /**
+     * Returns a list of all the accepted cast roles
+     *
+     * @param model
+     * @return "list" (cast roles)
+     */
     @RequestMapping(value = "/cast", method = RequestMethod.GET)
     public String getCast(Model model) {
         model.addAttribute("list", cast);
         return "list";
     }
 
+    /**
+     * Returns a list of all the accepted troupe and cast roles
+     *
+     * @param model
+     * @return "list" (troupe and cast roles)
+     */
     @RequestMapping(value = "/roles", method = RequestMethod.GET)
     public String getRoles(Model model) {
         List<String> roles = new ArrayList<>();
@@ -162,6 +180,19 @@ public class ProjectController {
         return "list";
     }
 
+    /**
+     * Creates a new project and sets the current user as its owner
+     *
+     * @param model
+     * @param title
+     * @param genres
+     * @param plot
+     * @param img
+     * @param min
+     * @param prizes
+     * @param idTokenString
+     * @return "response" (error message) in case an error occurs
+     */
     @RequestMapping(value = "/newProject", method = RequestMethod.POST)
     public String addProject(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String plot, @RequestParam String img, @RequestParam long min, @RequestParam String prizes, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -187,6 +218,16 @@ public class ProjectController {
         return "response";
     }
 
+    /**
+     * If the current user is the project's owner, creates a new part
+     *
+     * @param model
+     * @param project
+     * @param role
+     * @param character
+     * @param idTokenString
+     * @return "response" (error message) in case an error occurs
+     */
     @RequestMapping(value = "/part", method = RequestMethod.POST)
     public String addPart(Model model, @RequestParam int project, @RequestParam String role, @RequestParam String character, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -218,6 +259,14 @@ public class ProjectController {
         return "response";
     }
 
+    /**
+     * Assigns a candidate to a part
+     *
+     * @param model
+     * @param candidacy
+     * @param idTokenString
+     * @return "response" (error message) in case an error occurs
+     */
     @RequestMapping(value = "/assign", method = RequestMethod.POST)
     public String assignPart(Model model, @RequestParam int candidacy, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -249,6 +298,14 @@ public class ProjectController {
         return "response";
     }
 
+    /**
+     * Candidates the current user to the selected part
+     *
+     * @param model
+     * @param part
+     * @param idTokenString
+     * @return "response" (error message) in case an error occurs
+     */
     @RequestMapping(value = "/candidacy", method = RequestMethod.POST)
     public String addCandidacy(Model model, @RequestParam int part, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -274,50 +331,109 @@ public class ProjectController {
         return "response";
     }
 
+    /**
+     * Lists all the projects that have the given title as a substring of their
+     * title
+     *
+     * @param model
+     * @param title
+     * @return "projectsList" (list of projects)
+     */
     @RequestMapping(value = "/projects/{title}", method = RequestMethod.GET)
     public String listProjectsByTitle(Model model, @PathVariable String title) {
         model.addAttribute("projects", projectService.listProjectsByTitle(title));
         return "projectsList";
     }
 
+    /**
+     * Lists all the projects that have the given owner as a substring of their
+     * owner
+     *
+     * @param model
+     * @param owner
+     * @return "projectsList" (list of projects)
+     */
     @RequestMapping(value = "/projectsOwner/{owner}", method = RequestMethod.GET)
     public String listProjectsByOwner(Model model, @PathVariable String owner) {
         model.addAttribute("projects", projectService.listProjectsByOwner(owner));
         return "projectsList";
     }
 
+    /**
+     * Lists all the projects in which the given user is assigned to at least
+     * one role
+     *
+     * @param model
+     * @param collaborator
+     * @return "projectsList" (list of projects)
+     */
     @RequestMapping(value = "/projectsCollab/{collaborator}", method = RequestMethod.GET)
     public String listProjectsByCollaborator(Model model, @PathVariable String collaborator) {
         model.addAttribute("projects", projectService.listProjectsByCollaborator(collaborator));
         return "projectsList";
     }
 
+    /**
+     * Returns a list of projects based on the given parameters
+     *
+     * @param model
+     * @param title
+     * @param owner
+     * @param genre
+     * @param collab
+     * @param order
+     * @param asc
+     * @return "projectsList" (list of projects)
+     */
     @RequestMapping(value = "/projects", method = RequestMethod.POST)
     public String advancedProjectSearch(Model model, @RequestParam String title, @RequestParam String owner, @RequestParam String genre, @RequestParam String collab, @RequestParam String order, @RequestParam boolean asc) {
         model.addAttribute("projects", projectService.advancedProjectSearch(title, owner, genre, collab, order, asc));
         return "projectsList";
     }
 
+    /**
+     * Creates a new donation for the given project
+     *
+     * @param model
+     * @param payment
+     * @param idTokenString
+     * @param project
+     * @param amount
+     * @return "response" (error message) in case an error occurs
+     */
     @RequestMapping(value = "/donate", method = RequestMethod.POST)
-    public String donate(Model model, @RequestParam String payment, @RequestParam String idTokenString, @RequestParam int project, @RequestParam double amount) {
+    public String donate(Model model, @RequestParam String payment, @RequestParam String idTokenString, @RequestParam int project) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
         if (idToken == null) {
             model.addAttribute("success", false);
             model.addAttribute("response", "Donazione non effettuata: login non effettuato");
+            return "reponse";
         }
         String userId = idToken.getPayload().getSubject();
         try { // Call Web Service Operation
             if (userService.getUserById(userId) == null) {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Donazione non effettuata: utente inesistente");
+                return "response";
             }
             if (projectService.getProjectById(project) == null) {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Donazione non effettuata: progetto inesistente");
+                return "response";
             }
+            PayPalClient payPal = new PayPalClient();
+            JSONObject order = payPal.getOrder(payment);
+            System.out.println(order.toString(4));
+            if (!"impar-seller@atm-mi.ga".equals(order.getJSONArray("purchase_units").getJSONObject(0).getJSONObject("payee").getString("email_address"))) {
+                model.addAttribute("success", false);
+                model.addAttribute("response", "Donazione non effettuata: la donazione non è indirizzata a Snaporaz Inc.");
+                return "response";
+            }
+            double amount = order.getJSONArray("purchase_units").getJSONObject(0).getJSONObject("amount").getDouble("value");
             if (amount <= 0) {
                 model.addAttribute("success", false);
                 model.addAttribute("response", "Donazione non effettuata: l'importo deve essere superiore a 0");
+                return "response";
             }
             ejb.PaymentService_Service service = new ejb.PaymentService_Service();
             ejb.PaymentService port = service.getPaymentServicePort();
@@ -335,6 +451,8 @@ public class ProjectController {
                 model.addAttribute("response", "Donazione già effettuata");
             }
         } catch (Exception ex) {
+            System.out.println(ex.getClass());
+            System.out.println(ex.getMessage());
             model.addAttribute("success", false);
             model.addAttribute("response", "Donazione non effettuata: errore interno");
         }

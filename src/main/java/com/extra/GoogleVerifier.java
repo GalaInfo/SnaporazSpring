@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class GoogleVerifier {
     
     public static GoogleIdToken verify(String idTokenString){
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Arrays.asList("617542772314-f113vd4k8p397fto9s3pvopdknutqiv5.apps.googleusercontent.com", "617542772314-keo0t31kssvhk31g3ghjhho21m8s53cm.apps.googleusercontent.com", "617542772314-659dg0petgomou4g1lcqhquhictq0i24.apps.googleusercontent.com", "617542772314-9ma5pqji4ffagb0qhn3j6hruvntncvcj.apps.googleusercontent.com")).build();
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).setAudience(Arrays.asList("617542772314-a8v5q7ij1hgepm4asf90tamthd91017l.apps.googleusercontent.com", "617542772314-keo0t31kssvhk31g3ghjhho21m8s53cm.apps.googleusercontent.com", "617542772314-659dg0petgomou4g1lcqhquhictq0i24.apps.googleusercontent.com", "617542772314-9ma5pqji4ffagb0qhn3j6hruvntncvcj.apps.googleusercontent.com","617542772314-uu2398vh7if9ugrvpdggu0vgiei8bk13.apps.googleusercontent.com")).build();
         GoogleIdToken idToken = null;
         try {
             idToken = verifier.verify(idTokenString);

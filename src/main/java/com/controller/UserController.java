@@ -37,6 +37,12 @@ public class UserController {
         this.experienceService = s;
     }
 
+    /**
+     * If the user isn't registered it creates an account, returns user inforamtions in both cases
+     * @param model
+     * @param idTokenString Google login token
+     * @return  "login" (name, surname and id) in case of success, "response" (error message) otherwise
+     */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(Model model, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -62,6 +68,19 @@ public class UserController {
         }
     }
 
+    /**
+     * Updates user informations with given parameters
+     * @param model
+     * @param idTokenString Google login token
+     * @param name  user's name
+     * @param surname   user's surname
+     * @param roles user's main roles
+     * @param mail  user's mail
+     * @param birth user's birth date
+     * @param nation    user's nation
+     * @param image user's profile image
+     * @return  "user" (user informations and experiences) in case of success, "response" (error message) otherwise
+     */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String updateUser(Model model, @RequestParam String idTokenString, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam String mail, @RequestParam long birth, @RequestParam String nation, @RequestParam String image) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -81,6 +100,17 @@ public class UserController {
 
     }
 
+    /**
+     * Creates an experience and adds it to user's CV
+     * @param model
+     * @param title project title
+     * @param genres    project genres
+     * @param role  user's role in given project
+     * @param start experience start date
+     * @param end   experience start date
+     * @param idTokenString Google login token
+     * @return  "experience" (created experience informations) in case of success, "response" (error message) otherwise
+     */
     @RequestMapping(value = "/experience", method = RequestMethod.POST)
     public String addExperience(Model model, @RequestParam String title, @RequestParam String genres, @RequestParam String role, @RequestParam int start, @RequestParam int end, @RequestParam String idTokenString) {
         GoogleIdToken idToken = GoogleVerifier.verify(idTokenString);
@@ -100,6 +130,12 @@ public class UserController {
         return "response";
     }
 
+    /**
+     * Returns informations of the user with the given id
+     * @param model
+     * @param id    user's id
+     * @return  "user" (user informations and experiences) in case of success, "response" (error message) otherwise
+     */
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     public String getUserById(Model model, @PathVariable String id) {
         User user = userService.getUserById(id);
@@ -114,6 +150,20 @@ public class UserController {
         return "user";
     }
 
+    /**
+     * Returns a list of users based on the given parameters
+     * @param model
+     * @param name  user's name
+     * @param surname   user's surname
+     * @param roles user's main roles
+     * @param minAge    user's minimum age
+     * @param maxAge    user's maximum age
+     * @param project   id of the project the user worked at
+     * @param genres    genres of the project the user worked at
+     * @param order     type of order (surname, birth)
+     * @param asc   ascendant or descendant
+     * @return  "userList" (list of users) in case of success
+     */
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public String advancedUserSearch(Model model, @RequestParam String name, @RequestParam String surname, @RequestParam String roles, @RequestParam int minAge, @RequestParam int maxAge, @RequestParam String project, @RequestParam String genres, @RequestParam String order, @RequestParam boolean asc) {
         model.addAttribute("users", userService.advancedUserSearch(name, surname, roles, minAge, maxAge, project, genres, order, asc));
